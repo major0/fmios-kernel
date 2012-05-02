@@ -1,0 +1,167 @@
+Prototype proposal for new platform.
+------------------------------------
+
+The initial prototype will consist of 4 applications:
+
+ * Build engine hopefully based on builder.
+ * The GRUB2 bootloader.
+ * A very simple kernel
+ * A consumer process
+ * A producer process
+
+Builder
+-------
+
+Builder is a build engine developed by Mark Ferrell while working at Uplogix
+Technologies.  The core design was to support a stand-alone build environment
+simular to Peter Korsgaard's buildroot[1] tool while easily allowing usage of
+remote repositories as well as custom drop-in source trees.  Much of the layout
+of Builder is borrowed from ideas and concepts found in Gentoo's Ebuild
+framework, minus the Portage repository and query functionality.
+
+[1] http://buildroot.uclibc.org/
+
+Grub2
+-----
+
+The GRUB bootloader is the GRand Unified Bootloader.  One of the novel aspects
+of GRUB is that it is capable of pre-loading applications, referred to as
+modules, into memory at boot time and making them available to the kernel
+before the kernel has started execution.  This reduces the burden of starting
+up a new platform considerably.  It is expected that the Producer and Consumer
+processes will be loaded at boot time by GRUB.
+
+Kernel
+------
+
+Development of the kernel is the core goal of this endevour, and there exist a
+number of ideas planned as features, the inital goal within the prototype has
+been reduced to the bare minimums necessary to demonstrate the beginings of the
+new platform.
+
+Initially there will only be a few minamliztic subsystems implemented within the
+prototype kernel.
+
+Scheduler (sched.c)
+===================
+
+The scheduler needs to supply a very limited set of interfaces to the two
+user-land processes to complete the prototype.  Initially this only needs to be
+the ability to yield() the CPU and the ability to wake() a process.  These two
+interfaces will serve as the founding interfaces for much more complex
+operations within the kernel.  For example, a timed sleep() call would activate
+an alarm timer and then yield() the CPU.  When the alarm fires, the alarm
+handler would wake() the sleeping process and add it back to the runnable
+process list.
+
+The primary scheduling algorithm itself will use a very basic O(1) design
+consisting of an array of linked-lists and a bitmap which signals which list in
+the array contains a runnable process.  Each array/bitmap position corresponds
+to a scheduling priority, so performing Find First Set Bit operation on the
+bitmap will return the index into the array of the highest priority linked-list
+containing a runnable process, and the first process in said list is the one to
+run.
+
+Memory (mmap.c)
+===============
+
+The memory allocation itself is purely performed on a page basis.  To that end
+the initial allocator will be based on a B+ tree in which the leafs only
+reference page interfals.  In short, the B+ tree data specifies the page
+numbers which are available, and the leaf tracks the entire range of contiguous
+unallocated pages.  For example, a single leaf may indicate that pages 50
+through 1000 are unallocated.  Further more, due to the nature of a B+ tree,
+the leafs themselves are accessible as a linked list, allowing the page_alloc()
+function constant-time as it simply needs to pop from the head of the list.
+
+Initially the only functionality required from mem.c is the support of mmap()
+and mmunmap(), with added support for MAP_FIXED, MAP_SHARED, and MAP_ANONYMOUS.
+The mapping of file descriptors will not be necessary until prototyping is
+completed.
+
+Syscalls (syscall.c)
+====================
+
+This is the core interrupt vector for triggering requiests from userland to
+kernel land.  When applicable arguments to a function will be handed off via
+registers as opposed to be pushed onto a stack (similar to L4).  The core of
+the issue with the syscall.c handler is deciding if all the syscalls will be
+stacked on a single interrupt vector, or if they will be handled via a vector
+per syscall type. Initially the core of the ISR handler will be implemented
+within syscall.c as the syscall vector will be the only interrupt vector in
+service during the prototyping stage.
+
+Future Subsystems
+=================
+
+Subsystems which will be important in the future once the foundation work
+within the prototype is completed.
+
+ * isr.c: Interrupt Service Request handling, fundementally an extension of the
+   scheduler.
+
+ * ipc.c: Inner Process Communication, using shared memory maps for message
+   passing and yield()/wake() for notifying processes about changes to IPC
+   memory.
+
+ * proc.c: Process Management interface and the implementation of the full
+   process tree.
+
+ * rfork.c: Implement the Resource Fork interface which will handle fork(),
+   tfork(), and clone().
+
+ * exec.c: Implement the exec() interface.
+
+ * spawn.c: Implement the spawn() interface. (may be merged with exec.c)
+
+ * pid.c: Pid management interfaces such as pid_alloc(), pid_free(), the pid
+   B+Tree itself, and an LRU list retaining free'd pids will be stored here.
+   The Recently Free'd PID LRU list will be used to insure that no new process
+   can be created between inbetween pidof and kill.  As the pid B+Tree becomes
+   depleated, available pids will be collected from the LRU list.
+
+Kernel Library
+==============
+
+There will be a number of library interfaces necessary for implementing the
+scheduler and memory subsystems.  Many of these interfaces correspond to
+various POSIX interfaces, while others are more specific to algorithmic
+concepts.
+
+ * Atomic (lib/atomic.c, include/atomic.h):  Implementation of atomic
+   operations necessary for the implementation of higher-level exclusion
+   interfaces.  This requires implementing interfaces such as atomic
+   add/subtract/decrement/increment/exchange/etc...
+
+ * Spinlocks (lib/spinlock.c, include/spinlock.h): Implementation of
+   spin_lock()/spin_unlock() utilizing the atomic interfaces.
+   [note: it has not been decided if spinlocks are necessary to implement the
+   system as opposed to using lockless trees and lockless lists]
+
+ * LinkedLists (lib/llist.c, include/llist.h): Implementation of Linked-Lists
+   necessary for implementing sched.c and the B+ Tree.
+
+ * B+Tree (lib/bplus_tree.c, include/bplus_tree.h): Implementation of the
+   B+Tree tree interfaces necessary for implementing page_alloc(), page_free,
+   pid_alloc(), pid_free, and potentially used as in sched.c as the method for
+   implementing the linked-lists.
+
+ * Math (lib/math.c, include/math.h): Implementation of math operations not
+   available within the C syntax.  Operations such as find_first_set_bit() which
+   is necessary for sched.c.
+
+ * Memory (lib/mem.c, include/mem.h): Implementation of low-level memory
+   operations, such as memcpy(), memcmp(), etc.
+
+ * Strings (lib/string.c, include/string.h): Traditionally this is the
+   location for memory operations as C strings are traditionally just raw
+   memory.  In an attempt to give the option for replacing C strings with
+   something slightly more robust, the string operations and the memory
+   operations are being separated out into separate library components.
+
+Library Future
+==============
+
+Library interfaces planned for later imeplementation to make the kernel
+feature-complete. [note: to be filled in as necessary]
+
