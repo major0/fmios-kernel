@@ -1,0 +1,34 @@
+AC_INIT([fmios-kernel], [0.1.1])
+AC_CONFIG_AUX_DIR([.])
+
+AC_CANONICAL_HOST
+
+# Shutdown some of the normal compiler assumptions
+CFLAGS="-nostdinc -ffreestanding"
+LDFLAGS="-nostdlib"
+AC_SUBST([CFLAGS])
+AC_SUBST([LDFLAGS])
+
+# Locate our toolchain
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+
+# Newlib's attempt to set up a "sane default" compiler results in bipassing
+# autoconf's detection of the compiler during in some cross-compilation
+# environments.
+CC_FOR_BUILD="${CC}"
+AC_SUBST([CC_FOR_BUILD])
+export CC_FOR_BUILD
+export CC
+
+# Our handling of the fmios_arch directory
+case "$host_cpu" in
+(i*86)	ARCH=x86;;
+(*)	ARCH=$host_cpu;;
+esac
+AC_SUBST([ARCH])
+
+AC_CONFIG_SUBDIRS([newlib])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

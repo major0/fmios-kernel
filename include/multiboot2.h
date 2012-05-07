@@ -18,9 +18,8 @@
  *  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
  *  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
-#ifndef MULTIBOOT2_H
-#define MULTIBOOT2_H
+#ifndef _MULTIBOOT2_H
+#define _MULTIBOOT2_H
 
 /* How many bytes from the start of the file we search for the header.  */
 #define MULTIBOOT2_SEARCH			32768
@@ -75,6 +74,8 @@
 #define MULTIBOOT2_CONSOLE_FLAGS_EGA_TEXT_SUPPORTED 2
 
 #ifndef __ASSEMBLY__
+
+#include <stdint.h>
 
 struct multiboot2_header
 {

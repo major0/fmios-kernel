@@ -1,6 +1,6 @@
-#ifndef __ARCH_X86_IO_H__
-#define __ARCH_X86_IO_H__
-#include <types.h>
+#ifndef _ARCH_X86_IO_H
+#define _ARCH_X86_IO_H
+#include <stdint.h>
 
 extern void putchar(int c);
 
@@ -31,4 +31,4 @@ static inline void outb(int port, uint8_t data)
 		: "a" (data), "d" (port));
 }
 
-#endif /* __ARCH_X86_IO__ */
+#endif /* _ARCH_X86_IO_H */

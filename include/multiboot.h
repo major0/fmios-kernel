@@ -18,10 +18,8 @@
  *  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <types.h>
-
-#ifndef MULTIBOOT1_H
-#define MULTIBOOT1_H
+#ifndef _MULTIBOOT1_H
+#define _MULTIBOOT1_H
 
 /* How many bytes from the start of the file we search for the header.  */
 #define MULTIBOOT_SEARCH			8192
@@ -91,6 +89,8 @@
 #define MULTIBOOT_INFO_FRAMEBUFFER_INFO	        0x00001000
 
 #ifndef __ASSEMBLY__
+
+#include <stdint.h>
 
 struct multiboot_header
 {

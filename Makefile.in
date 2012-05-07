@@ -1,0 +1,36 @@
+srcdir = @srcdir@
+prefix = @prefix@
+ARCH = @ARCH@
+CC=@CC@
+INSTALL=@INSTALL@
+RANLIB=@RANLIB@
+CPPFLAGS = -I$(srcdir)/arch/@ARCH@/include/asm -I$(srcdir)/include -I$(srcdir)/newlib/libc/include
+CFLAGS = @CFLAGS@
+LIBS = newlib/libc.a
+LDFLAGS	= @LDFLAGS@
+SUBDIRS	= arch/$(ARCH) newlib
+
+include arch/$(ARCH)/Arch.make
+
+fmios-kernel_sources = src/itoa.c src/printk.c src/kmain.c $(patsubst %,arch/$(ARCH)/%,$(arch_sources))
+
+all: fmios-kernel
+
+fmios-kernel: $(fmios-kernel_sources) $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) $(fmios-kernel_sources) $(LIBS) -o fmios-kernel
+
+newlib/libc.a:
+	$(MAKE) -C newlib all || $(MAKE) -C newlib libc.a || exit 1
+
+install: all
+	@mkdir -p $(DESTDIR)$(prefix)/boot
+	$(INSTALL) fmios-kernel $(DESTDIR)$(prefix)/boot
+
+objs_clean:
+	rm -f fmios-kernel *.o src/*.o
+newlib_clean:
+	$(MAKE) -C newlib clean
+arch_clean:
+	$(MAKE) -C arch/$(ARCH) clean
+clean: arch_clean lib_clean objs_clean
+distclean: clean
