@@ -1,1 +1,1 @@
-arch_sources = boot.S console.c
+arch_sources = boot.S

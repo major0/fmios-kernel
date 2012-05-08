@@ -4,15 +4,16 @@ ARCH = @ARCH@
 CC=@CC@
 INSTALL=@INSTALL@
 RANLIB=@RANLIB@
-CPPFLAGS = -I$(srcdir)/arch/@ARCH@/include/asm -I$(srcdir)/include -I$(srcdir)/newlib/libc/include
+CPPFLAGS = -I$(srcdir)/arch/@ARCH@/include -I$(srcdir)/include -I$(srcdir)/newlib/libc/include
 CFLAGS = @CFLAGS@
-LIBS = newlib/libc.a
+LIBS = newlib/libc.a $(shell $(CC) -print-libgcc-file-name)
 LDFLAGS	= @LDFLAGS@
 SUBDIRS	= arch/$(ARCH) newlib
 
 include arch/$(ARCH)/Arch.make
 
-fmios-kernel_sources = src/itoa.c src/printk.c src/kmain.c $(patsubst %,arch/$(ARCH)/%,$(arch_sources))
+fmios-kernel_sources = src/itoa.c src/printk.c src/kmain.c src/8250.c src/ega.c
+fmios-kernel_sources += $(patsubst %,arch/$(ARCH)/%,$(arch_sources))
 
 all: fmios-kernel
 
