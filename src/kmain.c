@@ -32,15 +32,14 @@
  * serial=[off|<addr>][.<baud><bits><stopbit>[,<divisor>]
  */
 #include <multiboot.h>
-#include <multiboot2.h>
 
 static void multiboot1_init(uint32_t addr)
 {
-	multiboot_info_t *mbi = (multiboot_info_t *)addr;
+	multiboot1_info_t *mbi = (multiboot1_info_t *)addr;
 
 	printk("MULTIBOOT1\n");
 
-	if (mbi->flags & MULTIBOOT_INFO_CMDLINE
+	if (mbi->flags & MULTIBOOT1_INFO_CMDLINE
 	    && strlen((char *)mbi->cmdline)) {
 		/* FIXME We need strlen() as GRUB flags a command line with an
 		 * empty buffer */
@@ -49,15 +48,15 @@ static void multiboot1_init(uint32_t addr)
 
 	/* Are mods_* valid? Be careful as some platforms flag an empty module
 	 * list (aka QEMU) */
-	if (mbi->flags & MULTIBOOT_INFO_MODS && mbi->mods_count != 0) {
-		multiboot_module_t *mod;
+	if (mbi->flags & MULTIBOOT1_INFO_MODS && mbi->mods_count != 0) {
+		multiboot1_module_t *mod;
 		int i;
 
 		printk("MODULES: count=%d, addr=0x%x\n",
 				(int) mbi->mods_count,
 				(int) mbi->mods_addr);
 
-		for (i = 0, mod = (multiboot_module_t *) mbi->mods_addr;
+		for (i = 0, mod = (multiboot1_module_t *) mbi->mods_addr;
 				i < mbi->mods_count; i++, mod++) {
 			printk ("  start=0x%x, end=0x%x, cmdline=%s\n",
 					(unsigned) mod->mod_start,
@@ -66,19 +65,19 @@ static void multiboot1_init(uint32_t addr)
 		}
 	}
 
-	if (mbi->flags & MULTIBOOT_INFO_AOUT_SYMS) {
+	if (mbi->flags & MULTIBOOT1_INFO_AOUT_SYMS) {
 		printk("AOUT: not supported.\n");
 		return;
 	}
 
 	/* Are mmap_* valid? */
-	if (mbi->flags & MULTIBOOT_INFO_MEM_MAP) {
-		multiboot_memory_map_t *mmap;
+	if (mbi->flags & MULTIBOOT1_INFO_MEM_MAP) {
+		multiboot1_memory_map_t *mmap;
 
 		/* FIXME This is a mess */
-		for (mmap = (multiboot_memory_map_t *) mbi->mmap_addr;
+		for (mmap = (multiboot1_memory_map_t *) mbi->mmap_addr;
 		     (uint32_t) mmap < mbi->mmap_addr + mbi->mmap_length;
-		     mmap = (multiboot_memory_map_t *) ((uint32_t) mmap
+		     mmap = (multiboot1_memory_map_t *) ((uint32_t) mmap
 		     + mmap->size + sizeof (mmap->size))) {
 			printk ("MMAP: addr=0x%x%x, length=0x%x%x, type=0x%x\n",
 					(uint32_t) (mmap->addr >> 32),
@@ -90,12 +89,12 @@ static void multiboot1_init(uint32_t addr)
 	}
 
 #if 0
-	if (mbi->flags & MULTIBOOT_INFO_BOOT_LOADER_NAME) {
+	if (mbi->flags & MULTIBOOT1_INFO_BOOT_LOADER_NAME) {
 		printk("LOADER: name=%s\n", (char *)mbi->boot_loader_name);
 	}
 
 	/* Is the section header table of ELF valid? */
-	if (mbi->flags & MULTIBOOT_INFO_ELF_SHDR) {
+	if (mbi->flags & MULTIBOOT1_INFO_ELF_SHDR) {
 		multiboot_section_header_table_t *multiboot_sec = &(mbi->u.sec);
 
 		printk ("ELF: num=%u, size=0x%x,"
@@ -106,13 +105,13 @@ static void multiboot1_init(uint32_t addr)
 				(unsigned)multiboot_sec->shndx);
 	}
 
-	if (mbi->flags & MULTIBOOT_INFO_MEMORY) {
+	if (mbi->flags & MULTIBOOT1_INFO_MEMORY) {
 		printk("MEM: lower=%uKB, upper=%uKB\n",
 				(unsigned)mbi->mem_lower,
 				(unsigned)mbi->mem_upper);
 	}
 
-	if (mbi->flags & MULTIBOOT_INFO_BOOTDEV) {
+	if (mbi->flags & MULTIBOOT1_INFO_BOOTDEV) {
 		uint8_t bootdev = (uint8_t)(mbi->boot_device >> 24) & 0xff;
 		uint8_t slice = (uint8_t)(mbi->boot_device >> 16) & 0xff;
 		uint8_t part = (uint8_t)(mbi->boot_device >> 8) & 0xff;
@@ -122,7 +121,7 @@ static void multiboot1_init(uint32_t addr)
 	}
 #endif
 
-	if (mbi->flags & MULTIBOOT_INFO_FRAMEBUFFER_INFO) {
+	if (mbi->flags & MULTIBOOT1_INFO_FRAMEBUFFER_INFO) {
 		printk("FB: addr=0x%x, width=%u, height=%u, depth=%u,",
 				(uint32_t)mbi->framebuffer_addr,
 				(uint32_t)mbi->framebuffer_width,
@@ -145,19 +144,19 @@ static void multiboot1_init(uint32_t addr)
 	}
 #if 0
 	/* FIXME Can we use this information? */
-	if (mbi->flags & MULTIBOOT_INFO_DRIVE_INFO) {
+	if (mbi->flags & MULTIBOOT1_INFO_DRIVE_INFO) {
 		printk("DRIVES: addr=0x%x <unused>\n",
 				(uint32_t)mbi->drives_addr);
 	}
-	if (mbi->flags & MULTIBOOT_INFO_CONFIG_TABLE) {
+	if (mbi->flags & MULTIBOOT1_INFO_CONFIG_TABLE) {
 		printk("ROM CONFIG: addr=0x%x <unused>\n",
 				(uint32_t)mbi->config_table);
 	}
-	if (mbi->flags & MULTIBOOT_INFO_APM_TABLE) {
+	if (mbi->flags & MULTIBOOT1_INFO_APM_TABLE) {
 		printk("APM: addr=0x%x <unused>\n",
 				(uint32_t)mbi->apm_table);
 	}
-	if (mbi->flags & MULTIBOOT_INFO_VBE_INFO) {
+	if (mbi->flags & MULTIBOOT1_INFO_VBE_INFO) {
 		printk("VBE: addr=0x%x <unused>\n",
 				(uint32_t)mbi->vbe_control_info);
 	}
@@ -194,15 +193,15 @@ static void multiboot2_init_fb(struct multiboot2_tag *tag)
 		tagfb->common.framebuffer_bpp);
 
 	switch (tagfb->common.framebuffer_type) {
-	case MULTIBOOT2_FRAMEBUFFER_TYPE_INDEXED:
+	case MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED:
 		printk(" type=indexed\n");
 		break;
 
-	case MULTIBOOT2_FRAMEBUFFER_TYPE_RGB:
+	case MULTIBOOT_FRAMEBUFFER_TYPE_RGB:
 		printk(" type=rgb\n");
 		break;
 
-	case MULTIBOOT2_FRAMEBUFFER_TYPE_EGA_TEXT:
+	case MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT:
 		printk(" type=ega\n");
 		break;
 
@@ -302,7 +301,7 @@ static void multiboot2_init(uint32_t addr)
  * Parse the Multiboot Information and initialize the system */
 void kmain (unsigned long magic, unsigned long addr)
 {
-	if (magic != MULTIBOOT_BOOTLOADER_MAGIC &&
+	if (magic != MULTIBOOT1_BOOTLOADER_MAGIC &&
 	    magic != MULTIBOOT2_BOOTLOADER_MAGIC) {
 		printk("Invalid magic number: 0x%x\n", (unsigned)magic);
 		return;
@@ -313,7 +312,7 @@ void kmain (unsigned long magic, unsigned long addr)
 		return;
 	}
 
-	if (magic == MULTIBOOT_BOOTLOADER_MAGIC) {
+	if (magic == MULTIBOOT1_BOOTLOADER_MAGIC) {
 		multiboot1_init(addr);
 		return;
 	}

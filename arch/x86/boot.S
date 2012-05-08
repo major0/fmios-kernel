@@ -41,7 +41,6 @@
 #define F_VM    0x00020000      /* virtual 8086 */
 
 #include <multiboot.h>
-#include <multiboot2.h>
 
 /*
  * Entered through 32-bit task gate constructed in 16-bit mode
@@ -56,17 +55,17 @@ start:
 _start:
 	jmp     multiboot_entry
 
-.align  MULTIBOOT_HEADER_ALIGN
+.align  MULTIBOOT1_HEADER_ALIGN
 #ifdef CONFIG_USE_FRAMEBUFFER
-#define MULTIBOOT_HEADER_OPTIONS (MULTIBOOT_PAGE_ALIGN|MULTIBOOT_MEMORY_INFO|MULTIBOOT_VIDEO_MODE)
+#define MULTIBOOT1_HEADER_OPTIONS (MULTIBOOT1_PAGE_ALIGN|MULTIBOOT1_MEMORY_INFO|MULTIBOOT1_VIDEO_MODE)
 #else
-#define MULTIBOOT_HEADER_OPTIONS (MULTIBOOT_PAGE_ALIGN|MULTIBOOT_MEMORY_INFO)
+#define MULTIBOOT1_HEADER_OPTIONS (MULTIBOOT1_PAGE_ALIGN|MULTIBOOT1_MEMORY_INFO)
 #endif
 multiboot1_header:
-        .long   MULTIBOOT_HEADER_MAGIC
-        .long   MULTIBOOT_HEADER_OPTIONS
+        .long   MULTIBOOT1_HEADER_MAGIC
+        .long   MULTIBOOT1_HEADER_OPTIONS
         /* checksum */
-        .long   -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_OPTIONS)
+        .long   -(MULTIBOOT1_HEADER_MAGIC + MULTIBOOT1_HEADER_OPTIONS)
 #ifdef CONFIG_USE_FRAMEBUFFER
 	.long	0	/* what mode should we use? */
         .long	CONFIG_FRAMEBUFFER_WIDTH
