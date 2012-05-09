@@ -41,8 +41,6 @@ static void multiboot1_init(uint32_t addr)
 
 	if (mbi->flags & MULTIBOOT1_INFO_CMDLINE
 	    && strlen((char *)mbi->cmdline)) {
-		/* FIXME We need strlen() as GRUB flags a command line with an
-		 * empty buffer */
 		printk("KERNEL: cmdline=%s\n", (char *)mbi->cmdline);
 	}
 
