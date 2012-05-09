@@ -84,7 +84,7 @@ static void __serial_init(void) {
 
 	/* Print using printk() so the information can show up on alternate
 	 * output devices */
-	printk("8250_init: iobase=0x%x, baud=%d, flags=0x%x, div=0x%x\n",
+	printk("serial_init: iobase=0x%x, baud=%d, flags=0x%x, div=0x%x\n",
 			serial_iobase, serial_baud,
 			serial_flags, serial_div);
 }
@@ -99,6 +99,10 @@ int serial_putc(int c)
 
 	if (!serial_iobase) {
 		return 0;
+	}
+
+	if (c == '\n') {
+		serial_putc('\r');
 	}
 
 	/* Wait for TX_READY bit to be set */
@@ -133,12 +137,21 @@ void serial_init(uint32_t iobase, uint32_t baud, uint8_t flags,
 
 	/* Compute everything every way we can */
 	if (divisor && baud) {
+		serial_baud = baud;
+		serial_div = divisor;
 		serial_clock = divisor * baud * 16;
 	} else if (baud) {
+		serial_baud = baud;
 		serial_div = serial_clock / baud / 16;
 	} else if (divisor) {
+		serial_div = divisor;
 		serial_baud = serial_clock / divisor / 16;
 	}
 
-	__serial_init();
+	/* Only initialize the port if it was requested.  This allows
+	 * transparent use of the serial console which may have been setup by
+	 * the BIOS or the bootloader */
+	if (baud) {
+		__serial_init();
+	}
 }
