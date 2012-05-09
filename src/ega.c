@@ -1,7 +1,7 @@
 #include <asm/io.h>
 
 #define VIDEO_ADDR	0xb8000
-static uint16_t *video_addr = (uint16_t *)VIDEO_ADDR;
+static uint16_t *video_addr = 0; /* Disabled by default */
 
 #define VIDEO_COLS	80
 #define VIDEO_ROWS	25

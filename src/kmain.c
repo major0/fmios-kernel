@@ -32,6 +32,10 @@
  * serial=[off|<addr>][.<baud><bits><stopbit>[,<divisor>]
  */
 #include <multiboot.h>
+#include <fmios/serial.h>
+
+/* FIXME we need to put this somewhere useful */
+#define NULL 0
 
 static void multiboot1_init(uint32_t addr)
 {
@@ -293,6 +297,238 @@ static void multiboot2_init(uint32_t addr)
 	}
 }
 
+static char *kern_param(char *option, char *cmdline)
+{
+	int len;
+	char *param;
+
+	if (!option || !cmdline) {
+		return NULL;
+	}
+
+	if (!strlen(option) || !strlen(cmdline)) {
+		return NULL;
+	}
+
+	len = strlen(option);
+
+	while (*cmdline != '\0') {
+
+		if (*cmdline == ' ') {
+			cmdline++;
+			continue;
+		}
+
+		if (strncmp(option, cmdline, len) == 0) {
+			cmdline += len;
+			param = cmdline;
+
+			if (*param == '=') {
+				return ++param;
+			}
+		}
+
+		while (*cmdline != '\0' && *cmdline != ' ') {
+			cmdline++;
+		}
+	}
+
+	return NULL;
+}
+
+void mb_init_video(unsigned long magic, unsigned long addr)
+{
+	struct multiboot2_tag *tag;
+	uint32_t size = *(uint32_t *)addr;
+	char *param;
+	uint8_t fb_type;
+	uint64_t fb_addr = 0;
+	uint32_t fb_height = 0;
+	uint32_t fb_width = 0;
+	uint32_t fb_depth = 0;
+
+	if (magic == MULTIBOOT1_BOOTLOADER_MAGIC) {
+		multiboot1_info_t *mbi = (multiboot1_info_t *)addr;
+
+		if (mbi->flags & MULTIBOOT1_INFO_CMDLINE
+		    && strlen((char *)mbi->cmdline)) {
+			param = kern_param("video", (char *)mbi->cmdline);
+		}
+
+		/* FIXME we might need more data for other video types */
+		if (mbi->flags & MULTIBOOT1_INFO_FRAMEBUFFER_INFO) {
+			fb_addr = mbi->framebuffer_addr;
+			fb_height = mbi->framebuffer_height;
+			fb_width = mbi->framebuffer_width;
+			fb_type = mbi->framebuffer_type;
+			fb_depth = mbi->framebuffer_bpp;
+		}
+	} else { /* MULTIBOOT2 */
+		for (tag = (struct multiboot2_tag *) (addr + 8);
+		     tag->type != MULTIBOOT2_TAG_TYPE_END;
+		     tag = (struct multiboot2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7)))
+		{
+			struct multiboot2_tag_string *tag_string = (struct multiboot2_tag_string *)tag;
+			struct multiboot2_tag_framebuffer *tagfb
+				= (struct multiboot2_tag_framebuffer *)tag;
+
+			switch (tag->type) {
+			case MULTIBOOT2_TAG_TYPE_CMDLINE:
+				param = kern_param("video", tag_string->string);
+				break;
+			case MULTIBOOT2_TAG_TYPE_FRAMEBUFFER:
+				fb_type = tagfb->common.framebuffer_type;
+				fb_addr = tagfb->common.framebuffer_addr;
+				fb_height = tagfb->common.framebuffer_height;
+				fb_width = tagfb->common.framebuffer_width;
+				fb_depth = tagfb->common.framebuffer_bpp;
+				break;
+			}
+		}
+	}
+
+	/* cmdline param will be in the format of:
+	 * [addr|ega|cga|off][,<height>x<width>[,bpp]]]
+	 */
+	if (param) {
+		if (strncmp("off", param, 3) == 0) {
+			return;
+		}
+
+		if (strncmp("ega", param, 3) == 0
+		 || strncmp("cga", param, 3) == 0) {
+			fb_type = MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT;
+			fb_addr = 0xb8000;
+			param += 3;
+		} else {
+			addr = strtol(param, &param, 0);
+		}
+
+		if (*param == ',') {
+			fb_height = strtol(++param, &param, 0);
+			fb_width = strtol(++param, &param, 0);
+			if (*param == ',') {
+				fb_depth = strtol(++param, &param, 0);
+			}
+		}
+	}
+
+	switch (fb_type) {
+	case MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT:
+		ega_init(fb_addr, fb_height, fb_width);
+		break;
+	}
+}
+
+void mb_init_serial(unsigned long magic, unsigned long addr)
+{
+	struct multiboot2_tag *tag;
+	uint32_t size = *(uint32_t *)addr;
+	char *param;
+	uint32_t iobase = 0;
+	uint32_t baud = 0;
+	uint16_t divisor = 0;
+	uint8_t flags = 0;
+
+	if (magic == MULTIBOOT1_BOOTLOADER_MAGIC) {
+		multiboot1_info_t *mbi = (multiboot1_info_t *)addr;
+
+		if (mbi->flags & MULTIBOOT1_INFO_CMDLINE
+		    && strlen((char *)mbi->cmdline)) {
+			param = kern_param("serial", (char *)mbi->cmdline);
+		}
+	} else { /* MULTIBOOT2 */
+		for (tag = (struct multiboot2_tag *) (addr + 8);
+		     tag->type != MULTIBOOT2_TAG_TYPE_END;
+		     tag = (struct multiboot2_tag *)((uint8_t *)tag + ((tag->size + 7) & ~7)))
+		{
+			struct multiboot2_tag_string *tag_string = (struct multiboot2_tag_string *)tag;
+			if (tag->type ==  MULTIBOOT2_TAG_TYPE_CMDLINE) {
+				param = kern_param("serial", tag_string->string);
+				break;
+			}
+		}
+	}
+
+	/* cmdline param will be in the format of:
+	 * [iobase][,baud][,flags][,divisor]
+	 */
+	if (!param) {
+		return;
+	}
+
+	if (strncmp("off", param, 3) == 0) {
+		return;
+	}
+
+	iobase = strtol(param, &param, 0);
+
+	if (*param == ',') {
+		baud = strtol(++param, &param, 0);
+	}
+
+	if (*param == ',') {
+		++param;
+		switch (*param) {
+		case '8':
+			flags = SERIAL_8BIT;
+			param++;
+			break;
+		case '7':
+			flags = SERIAL_7BIT;
+			param++;
+			break;
+		case '6':
+			flags = SERIAL_6BIT;
+			param++;
+			break;
+		case '5':
+			flags = SERIAL_5BIT;
+			param++;
+			break;
+		}
+
+		if (flags) {
+			switch (*param) {
+			case 'e':
+			case 'E':
+				flags |= SERIAL_PARITY_EVEN;
+				param++;
+				break;
+			case 'o':
+			case 'O':
+				flags |= SERIAL_PARITY_ODD;
+				param++;
+				break;
+			case 'n':
+			case 'N':
+				flags |= SERIAL_PARITY_NONE;
+				param++;
+				break;
+			}
+
+			switch (*param) {
+			case '2':
+				flags |= SERIAL_STOP2;
+				param++;
+				break;
+			case '1':
+				flags |= SERIAL_STOP1;
+				param++;
+				break;
+			}
+		}
+	}
+
+	if (*param == ',') {
+		divisor = strtol(param, &param, 0);
+	}
+
+	serial_init(iobase, baud, flags, divisor);
+}
+
+
+
 /** OS independant initialization
  * @magic Multiboot magic number
  * @addr Address of Multiboot Information Structure
@@ -309,6 +545,11 @@ void kmain (unsigned long magic, unsigned long addr)
 		printk("Unaligned mbi: 0x%x\n", addr);
 		return;
 	}
+
+	mb_init_video(magic, addr);
+	mb_init_serial(magic, addr);
+
+	/* These are purely informational and will go away soon */
 
 	if (magic == MULTIBOOT1_BOOTLOADER_MAGIC) {
 		multiboot1_init(addr);

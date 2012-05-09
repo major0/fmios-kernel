@@ -59,7 +59,7 @@
 #define DEFAULT_IOBASE		0x3f8	/* COM1 */
 #define DEFAULT_CLOCK		1843200	/* 1.8Mhz */
 #define	DEFAULT_BAUD		9600
-static uint32_t serial_iobase = DEFAULT_IOBASE;
+static uint32_t serial_iobase = 0; /* Disabled by default */
 static uint64_t serial_clock = DEFAULT_CLOCK;
 static uint32_t serial_baud = DEFAULT_BAUD;
 static uint16_t serial_div = DEFAULT_CLOCK / DEFAULT_BAUD / 16;
