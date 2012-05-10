@@ -20,9 +20,9 @@ void printk (const char *format, ...)
 	arg++;
 
 	while ((c = *format++) != 0) {
-		if (c != '%')
+		if (c != '%') {
 			kputc(c);
-		else {
+		} else {
 			char *p;
 
 			c = *format++;

@@ -12,7 +12,7 @@ SUBDIRS	= arch/$(ARCH) newlib
 
 include arch/$(ARCH)/Arch.make
 
-fmios-kernel_sources = src/itoa.c src/printk.c src/kmain.c src/8250.c src/ega.c
+fmios-kernel_sources = src/itoa.c src/printk.c src/multiboot.c src/8250.c src/ega.c
 fmios-kernel_sources += $(patsubst %,arch/$(ARCH)/%,$(arch_sources))
 
 all: fmios-kernel

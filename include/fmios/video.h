@@ -1,4 +1,4 @@
-/* serial.h - Serial definitions */
+/* video.h - Video structures and routins */
 /* Copyright (C) 2012 Mark Ferrell
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,19 +18,17 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
  * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+#ifndef _FMIOS_VIDEO_H
+#define _FMIOS_VIDEO_H
 
-#ifndef _FMIOS_SERIAL_H
-#define _FMIOS_SERIAL_H
+struct video_config {
+	uint64_t	addr;
+	uint32_t	height;
+	uint32_t	width;
+	uint32_t	depth;
+	uint8_t		type;
+};
 
-/* These are standard in 8250, might was well make them universal */
-#define SERIAL_PARITY_EVEN	(1<<4 | 1<<3)
-#define SERIAL_PARITY_ODD	(1<<3)
-#define SERIAL_PARITY_NONE	(0x0)
-#define SERIAL_STOP2		(1<<2)
-#define SERIAL_STOP1		(0x0)
-#define SERIAL_8BIT		0x3
-#define SERIAL_7BIT		0x2
-#define SERIAL_6BIT		0x1
-#define SERIAL_5BIT		0x0
+void ega_init(uint32_t addr, uint8_t cols, uint8_t rows);
 
-#endif /* _FMIOS_SERIAL_H */
+#endif /* _FMIOS_VIDEO_H */
