@@ -24,11 +24,10 @@ AC_ARG_ENABLE([multiboot1],
 	[enable_multiboot1=auto])
 
 # Map the gcc $host_cpu to the fmios/arch sources
-legacy_multiboot1=disabled
 case "$host_cpu" in
-(i*86)	ARCH=x86
-	legacy_multiboot1=auto;;
-(*)	ARCH=$host_cpu;;
+(i*86)	ARCH=x86;;
+(*)	ARCH=$host_cpu
+	enable_multiboot1=disabled;;
 esac
 AC_SUBST([ARCH])
 
