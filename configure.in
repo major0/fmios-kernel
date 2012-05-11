@@ -4,12 +4,6 @@ AC_PREFIX_DEFAULT([])
 
 AC_CANONICAL_HOST
 
-# Shutdown some of the normal compiler assumptions
-CFLAGS="-nostdinc -ffreestanding"
-LDFLAGS="-nostdlib"
-AC_SUBST([CFLAGS])
-AC_SUBST([LDFLAGS])
-
 # Locate our toolchain
 AC_PROG_CC
 AC_PROG_INSTALL
@@ -35,14 +29,6 @@ AS_IF([test "x$enable_multiboot1" != xdisabled],
 	[AC_DEFINE([CONFIG_ENABLE_MULTIBOOT1], [1],
 		[Define to enable legacy Multiboot support])])
 
-# Newlib's attempt to set up a "sane default" compiler results in bipassing
-# autoconf's detection of the compiler in some cross-compilation environments.
-CC_FOR_BUILD="${CC}"
-AC_SUBST([CC_FOR_BUILD])
-export CC_FOR_BUILD
-export CC
-
 AC_CONFIG_HEADER([include/fmios/config.h])
-AC_CONFIG_SUBDIRS([newlib])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
