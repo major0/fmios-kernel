@@ -19,7 +19,8 @@
  * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <asm/io.h>
+#include <fmios/types.h>
+#include <fmios/io.h>
 
 #define VIDEO_ADDR	0xb8000
 static uint16_t *video_addr = 0; /* Disabled by default */

@@ -1,4 +1,9 @@
-#include <asm/io.h>
+#include <fmios/types.h>
+#include <fmios/io.h>
+#include <fmios/video.h>
+#include <fmios/serial.h>
+
+extern void itoa (char *buf, int base, int d);
 
 static void kputc(int c)
 {

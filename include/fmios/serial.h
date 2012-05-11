@@ -33,4 +33,11 @@
 #define SERIAL_6BIT		0x1
 #define SERIAL_5BIT		0x0
 
+#ifndef __ASSEMBLY__
+
+int serial_putc(int c);
+void serial_init(uint32_t iobase, uint32_t baud, uint8_t flags, uint16_t divisor);
+
+#endif
+
 #endif /* _FMIOS_SERIAL_H */

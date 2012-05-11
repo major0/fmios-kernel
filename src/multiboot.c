@@ -38,12 +38,14 @@
  * serial=[off|<addr>][.<baud><bits><stopbit>[,<divisor>]
  */
 #include <fmios/config.h>
+#include <fmios/types.h>
 #include <fmios/serial.h>
 #include <fmios/video.h>
+#include <fmios/io.h>
 #include <multiboot.h>
+#include <string.h>
 
 /* FIXME we need to put this somewhere useful */
-#define NULL 0
 
 struct multiboot_tag *mb_tag_find(unsigned long addr, uint16_t type)
 {
@@ -147,11 +149,11 @@ static void mb_init_video(char *cmdline, struct video_config *config)
 
 static void mb_init_serial(char *cmdline)
 {
-	char *param;
 	uint32_t iobase = 0;
 	uint32_t baud = 0;
 	uint16_t divisor = 0;
 	uint8_t flags = 0;
+	char *param;
 
 	param = mb_cmdline_find("serial", cmdline);
 
@@ -351,7 +353,6 @@ static struct mmap_entry * mb2_mmap(unsigned long magic,
 {
 	struct mmap_entry used[8];
 	struct mmap_entry mmap[8];
-	int index;
 
 	memset(&used, 0, sizeof(struct mmap_entry) * 8);
 	memset(&mmap, 0, sizeof(struct mmap_entry) * 8);
@@ -415,7 +416,6 @@ static void * mb1_map_mem(unsigned long addr, struct mmap_entry *mmap)
 static void * mb1_map_used(unsigned long addr, struct mmap_entry *used)
 {
 	multiboot1_info_t *mbi = (multiboot1_info_t *)addr;
-	multiboot1_memory_map_t *mmap;
 
 	/* Flag the Multiboot header region as in use */
 	/* FIXME this does not include structures in memory that
@@ -447,7 +447,6 @@ static struct mmap_entry * mb1_mmap(unsigned long magic,
 {
 	struct mmap_entry used[8];
 	struct mmap_entry mmap[8];
-	int index;
 
 	memset(&used, 0, sizeof(struct mmap_entry) * 8);
 	memset(&mmap, 0, sizeof(struct mmap_entry) * 8);
@@ -508,7 +507,7 @@ void mb_init(unsigned long magic, unsigned long addr)
 			mb_init_video(cmdline, &fb);
 		}
 
-		mmap = mb2_mmap(magic, addr);
+		mmap = mb1_mmap(magic, addr);
 	} else
 #endif
 	if (magic != MULTIBOOT2_BOOTLOADER_MAGIC) {

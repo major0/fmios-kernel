@@ -21,6 +21,9 @@
 #ifndef _FMIOS_VIDEO_H
 #define _FMIOS_VIDEO_H
 
+
+#ifndef __ASSEMBLY__
+
 #include <stdint.h>
 
 struct video_config {
@@ -32,5 +35,8 @@ struct video_config {
 };
 
 void ega_init(uint32_t addr, uint8_t cols, uint8_t rows);
+int ega_putc(int c);
+
+#endif /* __ASSEMBLY__ */
 
 #endif /* _FMIOS_VIDEO_H */
