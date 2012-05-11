@@ -45,8 +45,6 @@
 #include <multiboot.h>
 #include <string.h>
 
-/* FIXME we need to put this somewhere useful */
-
 struct multiboot_tag *mb_tag_find(unsigned long addr, uint16_t type)
 {
 	struct multiboot_tag *tag = (struct multiboot_tag *)(addr + 8);
@@ -530,6 +528,7 @@ void mb_init(unsigned long magic, unsigned long addr)
 				= (struct multiboot_tag_framebuffer *)tag;
 
 			memset(&fb, 0, sizeof(struct video_config));
+
 			fb.type = tagfb->common.framebuffer_type;
 			fb.addr = tagfb->common.framebuffer_addr;
 			fb.height = tagfb->common.framebuffer_height;
