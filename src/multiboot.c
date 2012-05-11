@@ -541,10 +541,16 @@ void mb_init(unsigned long magic, unsigned long addr)
 		mmap = mb2_mmap(magic, addr);
 	}
 
+	if (!mmap) {
+		printk("ERROR: no memory mapping available\n");
+		return;
+	}
+
 	for (index = 0; index < 8; index++) {
 		if (!mmap[index].type) {
 			continue;
 		}
+
 		printk ("MMAP[%d]: addr=0x%x%x, length=0x%x%x, type=0x%x, flags=0x%x\n",
 				index,
 				(uint32_t) (mmap[index].addr >> 32),
