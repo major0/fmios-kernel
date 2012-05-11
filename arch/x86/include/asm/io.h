@@ -2,7 +2,7 @@
 #define _ARCH_X86_IO_H
 #include <stdint.h>
 
-extern void putchar(int c);
+#ifndef __ASSEMBLY__
 
 /*
  * inb()
@@ -30,5 +30,7 @@ static inline void outb(int port, uint8_t data)
 		: /* No output */
 		: "a" (data), "d" (port));
 }
+
+#endif /* __ASSEMBLY__ */
 
 #endif /* _ARCH_X86_IO_H */
