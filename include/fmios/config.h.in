@@ -1,4 +1,5 @@
 #ifndef _FMIOS_CONFIG_H
+#define _FMIOS_CONFIG_H
 
 /* Enable support for legacy Multiboot bootlaoders */
 #undef CONFIG_ENABLE_MULTIBOOT1

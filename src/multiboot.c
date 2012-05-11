@@ -37,9 +37,10 @@
  * video=[off|<addr>][,<height>,<width>,<bpp>]
  * serial=[off|<addr>][.<baud><bits><stopbit>[,<divisor>]
  */
-#include <multiboot.h>
+#include <fmios/config.h>
 #include <fmios/serial.h>
 #include <fmios/video.h>
+#include <multiboot.h>
 
 /* FIXME we need to put this somewhere useful */
 #define NULL 0
@@ -456,7 +457,7 @@ static struct mmap_entry * mb1_mmap(unsigned long magic,
 	}
 
 	if (!mb1_map_mem(addr, mmap)) {
-		return;
+		return NULL;
 	}
 
 	/* TODO Add the kernel mapping to used memory and merge the regions */
@@ -465,7 +466,7 @@ static struct mmap_entry * mb1_mmap(unsigned long magic,
 	 * for ELF, luckily this information stays constant regardless of the
 	 * multiboot format */
 
-	return mmap;
+	return NULL;
 }
 #endif
 
@@ -486,15 +487,17 @@ void mb_init(unsigned long magic, unsigned long addr)
 
 #ifdef CONFIG_ENABLE_MULTIBOOT1
 	if (magic == MULTIBOOT1_BOOTLOADER_MAGIC) {
+		multiboot1_info_t *mbi = (multiboot1_info_t *)addr;
+
 		if (mbi->flags & MULTIBOOT1_INFO_CMDLINE) {
-			cmdline = mbi->cmdline;
+			cmdline = (char *)mbi->cmdline;
 		}
-		mb1_init_serial(cmdline);
+		mb_init_serial(cmdline);
 
 		if (mbi->flags & MULTIBOOT1_INFO_FRAMEBUFFER_INFO) {
 			struct video_config fb;
 
-			memset(&fb, 0, sizeif(struct video_config));
+			memset(&fb, 0, sizeof(struct video_config));
 
 			fb.addr = mbi->framebuffer_addr;
 			fb.height = mbi->framebuffer_height;
@@ -502,7 +505,7 @@ void mb_init(unsigned long magic, unsigned long addr)
 			fb.type = mbi->framebuffer_type;
 			fb.depth = mbi->framebuffer_bpp;
 
-			mb_video_init(cmdline, &fb);
+			mb_init_video(cmdline, &fb);
 		}
 
 		mmap = mb2_mmap(magic, addr);

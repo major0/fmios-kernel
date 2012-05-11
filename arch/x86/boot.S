@@ -42,6 +42,7 @@
 #define F_RF    0x00010000      /* resume flag */
 #define F_VM    0x00020000      /* virtual 8086 */
 
+#include <fmios/config.h>
 #include <multiboot.h>
 
 /* Entered through 32-bit task gate constructed in 16-bit mode

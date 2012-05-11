@@ -18,7 +18,9 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
  * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+#include <fmios/config.h>
 #include <asm/io.h>
+#include <stdint.h>
 
 /* 8250 registers */
 #define DIVISOR_LOW_REG		0x00	/* When DLAB set */

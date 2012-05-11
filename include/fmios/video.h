@@ -21,6 +21,8 @@
 #ifndef _FMIOS_VIDEO_H
 #define _FMIOS_VIDEO_H
 
+#include <stdint.h>
+
 struct video_config {
 	uint64_t	addr;
 	uint32_t	height;
