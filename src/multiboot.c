@@ -292,7 +292,7 @@ static void mb_init_serial(char *cmdline)
 	serial_init(iobase, baud, flags, divisor);
 }
 
-static size_t mb_mmap_count(unsigned long addr, unsigned long magic)
+static size_t mb_pmap_count(unsigned long addr, unsigned long magic)
 {
 	size_t count = 0;
 
@@ -429,23 +429,24 @@ static struct kconfig *mb_alloc_pages(unsigned long addr,
 	return (struct kconfig *)(pstart * PAGE_SIZE);
 }
 
-static int mb_mmap_shift(struct mmap_entry *entries, int count)
+static int mb_pmap_shift(struct pmap_entry *entries, int count)
 {
 	int index = 0;
 
 	/* Figure out how many entries we have left */
-	while (entries[index+1].flags != MEMORY_MAP_END) {
+	while (entries[index+1].flags != MEMORY_PMAP_END) {
 		index++;
 	}
 
 	if (!index) {
+		printk("error: failed to shift page map %d\n", count);
 		return 0;
 	}
 
 	while ((index-count) >= 0) {
 		if (entries[index-count].type) {
 			memcpy(&entries[index], &entries[index-count],
-				sizeof(struct mmap_entry));
+				sizeof(struct pmap_entry));
 		}
 		index--;
 	}
@@ -453,84 +454,110 @@ static int mb_mmap_shift(struct mmap_entry *entries, int count)
 	return 1;
 }
 
-/* Insert the given mmap entry into the existing mmap table.  We need to
+/* Insert the given pmap entry into the existing pmap table.  We need to
  * properly split existing regions and reset the start/len elements with each
  * insert. */
-static int mb_mmap_add(struct mmap_table *mmap, struct mmap_entry *entry)
+static int mb_pmap_add(struct pmap_table *pmap, struct pmap_entry *entry)
 {
-	struct mmap_entry *entries = &mmap->entry[0];
+	struct pmap_entry *entries = &pmap->entry[0];
 	int index;
 
-#ifdef CONFIG_ENABLE_DEBUG
-	printk("new mmap: addr=0x%x%x, len=0x%x%x, type=0x%x, flags=0x%x\n",
-			(uint32_t)(entry->addr >> 32),
-			(uint32_t)(entry->addr),
-			(uint32_t)(entry->len >> 32),
-			(uint32_t)(entry->len),
-			entry->type, entry->flags);
-#endif
+	for (index = 0; index < pmap->count; index++) {
 
-	for (index = 0; index < mmap->count; index++) {
-		if (entry->addr >= (entries[index].addr + entries[index].len)
-		    || (entry->addr + entry->len) <= entries[index].addr) {
-#ifdef CONFIG_ENABLE_DEBUG
-			printk("skip map: addr=0x%x%x, len=0x%x%x, type=0x%x, flags=0x%x\n",
-				(uint32_t)(entries[index].addr >> 32),
-				(uint32_t)(entries[index].addr),
-				(uint32_t)(entries[index].len >> 32),
-				(uint32_t)(entries[index].len),
-				entries[index].type, entries[index].flags);
-#endif
+		/* Avoid unusable memory */
+		if (entries[index].type != MULTIBOOT_MEMORY_AVAILABLE) {
 			continue;
 		}
 
+		if (entry->start > entries[index].end + 1) {
+			continue;
+		}
+		if (entry->end < entries[index].start) {
+			continue;
+		}
 
-		if (!entries[index].type == MULTIBOOT_MEMORY_AVAILABLE) {
-			printk("error: used address in unusable memory\n");
+		/* Prevent page overlap for pages with different types */
+		if (((entry->start <= entries[index].end
+				|| entry->end >= entries[index].start)
+				&& (entries[index].flags
+				 && (entries[index].flags != entry->flags)))
+		    || (entry->end >= entries[index+1].start
+				&& (entries[index+1].flags
+				 && entries[index].flags != entry->flags))) {
+			printk("error: pages overlap non-free regions\n");
 			return 0;
 		}
 
-		/* Move all the entries after the current entry up by 2
-		 * positions */
-		if (!mb_mmap_shift(&entries[index+1], 2)) {
-			printk("error: failed to shift memory map\n");
-			return 0;
+		/* New used entry is at the start of the current map, either
+		 * the new entry is 1 page in size and of the same type, or the
+		 * existing page is part of a free region. */
+		if (entry->start == entries[index].start) {
+
+			/* Data that shares a page? */
+			if (entry->flags == entries[index].flags) {
+				break;
+			}
+
+			if (!mb_pmap_shift(&entries[index], 1)) {
+				return 0;
+			}
+
+			entries[index].start = entry->start;
+			entries[index].end = entry->end;
+			entries[index].type = entry->type;
+			entries[index].flags = entry->flags;
+
+			entries[index+1].start = entry->end + 1;
+			break;
 		}
 
-#ifdef CONFIG_ENABLE_DEBUG
-		printk("add into: addr=0x%x%x, len=0x%x%x, type=0x%x, flags=0x%x\n",
-			(uint32_t)(entries[index].addr >> 32),
-			(uint32_t)(entries[index].addr),
-			(uint32_t)(entries[index].len >> 32),
-			(uint32_t)(entries[index].len),
-			entries[index].type, entries[index].flags);
-#endif
+		/* New entry is at the tail of the current map */
+		if ((entry->start == entries[index].end ||
+		    (entry->start - 1) == entries[index].end)) {
+
+			/* Same type of memory, join regions */
+			if (entry->flags == entries[index].flags) {
+				entries[index].end = entry->end;
+				entries[index+1].start = entry->end + 1;
+				break;
+			}
+
+			/* Opertunistic merging with existing runs */
+			if (entry->flags == entries[index+1].flags &&
+			    (entry->end + 1) == entries[index+1].start) {
+				entries[index+1].start = entry->start;
+			}
+		}
+
+		/* Have to split the region, move all the entries after the
+		 * current entry up by 2 positions */
+		if (!mb_pmap_shift(&entries[index+1], 2)) {
+			return 0;
+		}
 
 		/* Copy the new entry in splitting the old entry into 2
 		 * entries */
-		entries[index+1].addr = entry->addr;
-		entries[index+1].len = entry->len;
+		entries[index+1].start = entry->start;
+		entries[index+1].end = entry->end;
 		entries[index+1].type = entry->type;
 		entries[index+1].flags = entry->flags;
 
 		/* Trailing segment of original memory */
-		entries[index+2].addr = (entry->addr + entry->len);
-		entries[index+2].len = (entries[index].addr + entries[index].len)
-		      -	(entries[index+2].addr);
+		entries[index+2].start = (entry->end + 1);
+		entries[index+2].end = entries[index].end;
 		entries[index+2].type = entries[index].type;
 		entries[index+2].flags = entries[index].flags;
 
-		entries[index].len = entries[index+1].addr - entries[index].addr;
-
-		index++;
+		entries[index].end = entries[index+1].start - 1;
+		break;
 	}
 	return index;
 }
 
-static int mb_mmap_init(struct kconfig *kconfig)
+static int mb_pmap_init(struct kconfig *kconfig)
 {
-	struct mmap_entry *entry = kconfig->mmap.entry;
-	struct mmap_entry current;
+	struct pmap_entry *entry = kconfig->pmap.entry;
+	struct pmap_entry current;
 
 #ifdef CONFIG_ENABLE_MULTIBOOT1
 	if (kconfig->mb_magic == MULTIBOOT1_BOOTLOADER_MAGIC) {
@@ -557,16 +584,16 @@ static int mb_mmap_init(struct kconfig *kconfig)
 
 			meminfo = (struct multiboot_tag_basic_meminfo *)tag;
 
-			entry[index].addr = 0;
-			entry[index].len = meminfo->mem_lower * 1024;
+			entry[index].start = 0;
+			entry[index].end = PAGE_NUM(meminfo->mem_lower * 1024) - 1;
 			entry[index].type = MULTIBOOT_MEMORY_AVAILABLE;
-			entry[index].flags = MEMORY_MAP_UNUSED;
+			entry[index].flags = MEMORY_PMAP_UNUSED;
 			index++;
 
-			entry[index].addr = 1024 * 1024;
-			entry[index].len = meminfo->mem_upper * 1024;
+			entry[index].start = PAGE_NUM(1024 * 1024);
+			entry[index].end = PAGE_NUM(meminfo->mem_upper * 1024) - 1;
 			entry[index].type = MULTIBOOT_MEMORY_AVAILABLE;
-			entry[index].flags = MEMORY_MAP_UNUSED;
+			entry[index].flags = MEMORY_PMAP_UNUSED;
 			index++;
 		} else {
 			multiboot_memory_map_t *mb_mmap;
@@ -580,29 +607,30 @@ static int mb_mmap_init(struct kconfig *kconfig)
 			     mb_mmap = (multiboot_memory_map_t *)((uint32_t)mb_mmap
 			     + ((struct multiboot_tag_mmap *)tag)->entry_size)) {
 
-				entry[index].addr = mb_mmap->addr;
-				entry[index].len = mb_mmap->len;
+				entry[index].start = PAGE_NUM(mb_mmap->addr);
+				entry[index].end = PAGE_NUM(mb_mmap->addr + mb_mmap->len) - 1;
 				entry[index].type = mb_mmap->type;
-				entry[index].flags = MEMORY_MAP_UNUSED;
+				entry[index].flags = MEMORY_PMAP_UNUSED;
 				index++;
 			}
 		}
 
-		current.addr = kernel_start;
-		current.len = (kernel_end - kernel_start);
+		current.start = PAGE_NUM(kernel_start);
+		current.end = PAGE_NUM(kernel_end);
 		current.type = MULTIBOOT_MEMORY_AVAILABLE;
-		current.flags = MEMORY_MAP_KERNEL;
-		if (!mb_mmap_add(&kconfig->mmap, &current)) {
+		current.flags = MEMORY_PMAP_KERNEL;
+		if (!mb_pmap_add(&kconfig->pmap, &current)) {
 			printk("error: failed to map the kernel\n");
 			return 0;
 		}
 
 		/* Insert a mapping for the multiboot data */
-		current.addr = kconfig->mb_addr;
-		current.len = mb_mbi_len(kconfig->mb_addr, kconfig->mb_magic);
+		current.start = PAGE_NUM(kconfig->mb_addr);
+		current.end = PAGE_NUM(kconfig->mb_addr +
+			mb_mbi_len(kconfig->mb_addr, kconfig->mb_magic));
 		current.type = MULTIBOOT_MEMORY_AVAILABLE;
-		current.flags = MEMORY_MAP_LOADER;
-		if (!mb_mmap_add(&kconfig->mmap, &current)) {
+		current.flags = MEMORY_PMAP_LOADER;
+		if (!mb_pmap_add(&kconfig->pmap, &current)) {
 			printk("error: failed to map multiboot information\n");
 			return 0;
 		}
@@ -613,19 +641,19 @@ static int mb_mmap_init(struct kconfig *kconfig)
 			struct multiboot_tag_module *tag_module
 				= (struct multiboot_tag_module *)tag;
 
-			current.addr = tag_module->mod_start;
-			current.len = (tag_module->mod_end - tag_module->mod_start);
+			current.start = PAGE_NUM(tag_module->mod_start);
+			current.end = PAGE_NUM(tag_module->mod_end);
 			current.type = MULTIBOOT_MEMORY_AVAILABLE;
-			current.flags = MEMORY_MAP_MODULE;
+			current.flags = MEMORY_PMAP_MODULE;
 
-			if (!mb_mmap_add(&kconfig->mmap, &current)) {
+			if (!mb_pmap_add(&kconfig->pmap, &current)) {
 				printk("error: failed to map modules\n");
 				return 0;
 			}
 		}
 	}
 
-	return kconfig->mmap.count;
+	return kconfig->pmap.count;
 }
 
 /**
@@ -644,14 +672,14 @@ static struct kconfig * kconfig_alloc(unsigned long addr, unsigned long magic)
 {
 	/* The kconfig tracks various kernel config options, a pointer to the
 	 * kernel cmdline, the number of CPUs, and tracks the number of
-	 * mmap_entries follow the kconfig structure */
+	 * pmap_entries follow the kconfig structure */
 	size_t size = sizeof(struct kconfig);
-	/* The number of mmap_entry structures we need, technically every entry
+	/* The number of pmap_entry structures we need, technically every entry
 	 * added to an existing map entry has the potential to split entries in
 	 * half.  So in a worst-case condition we need double the count. */
-	size_t count = (mb_mmap_count(addr, magic) * 2);
+	size_t count = (mb_pmap_count(addr, magic) * 2);
 
-	size += (count * sizeof(struct mmap_entry));
+	size += (count * sizeof(struct pmap_entry));
 
 	kconfig = mb_alloc_pages(addr, magic, PAGE_NUM(size) + 1);
 
@@ -662,24 +690,23 @@ static struct kconfig * kconfig_alloc(unsigned long addr, unsigned long magic)
 
 		memset(kconfig, 0, sizeof(struct kconfig));
 
-		kconfig->cmdline = mb_cmdline(addr, magic);
 		kconfig->mb_magic = magic;
 		kconfig->mb_addr = addr;
 
-		memset(&kconfig->mmap.entry[0], 0,
-		       (sizeof(struct mmap_entry) * count));
-		kconfig->mmap.count = count;
-		kconfig->mmap.entry[count].flags = MEMORY_MAP_END;
+		memset(&kconfig->pmap.entry[0], 0,
+		       (sizeof(struct pmap_entry) * count));
+		kconfig->pmap.count = count;
+		kconfig->pmap.entry[count].flags = MEMORY_PMAP_END;
 
-		if (mb_mmap_init(kconfig)) {
-			struct mmap_entry entry;
+		if (mb_pmap_init(kconfig)) {
+			struct pmap_entry entry;
 
-			entry.addr = (unsigned long)kconfig;
-			entry.len = size;
+			entry.start = PAGE_NUM((unsigned long)kconfig);
+			entry.end = PAGE_NUM((unsigned long)kconfig + size);
 			entry.type = MULTIBOOT_MEMORY_AVAILABLE;
-			entry.flags = MEMORY_MAP_KERNEL;
+			entry.flags = MEMORY_PMAP_KERNEL;
 
-			if (mb_mmap_add(&kconfig->mmap, &entry)) {
+			if (mb_pmap_add(&kconfig->pmap, &entry)) {
 				return kconfig;
 			}
 		}
@@ -692,36 +719,33 @@ static struct kconfig * kconfig_alloc(unsigned long addr, unsigned long magic)
 static void __init_memory(struct kconfig *kconfig)
 {
 	int index;
-	struct mmap_entry *entry = kconfig->mmap.entry;
+	struct pmap_entry *entry = kconfig->pmap.entry;
 
-	printk("Available memory:\n");
+	printk("Page Mapping:\n");
 
 	/* Display the memory map we currently have to aid in board bringups */
-	for (index = 0; index < kconfig->mmap.count; index++) {
+	for (index = 0; index < kconfig->pmap.count; index++) {
 		if (entry[index].type != MULTIBOOT_MEMORY_AVAILABLE) {
 			continue;
 		}
 
 		switch (entry[index].flags) {
-		case MEMORY_MAP_KERNEL:
-			printk("kernel: ");
+		case MEMORY_PMAP_KERNEL:
+			printk("  kernel: ");
 			break;
-		case MEMORY_MAP_LOADER:
-			printk("loader: ");
+		case MEMORY_PMAP_LOADER:
+			printk("  loader: ");
 			break;
-		case MEMORY_MAP_MODULE:
-			printk("module: ");
+		case MEMORY_PMAP_MODULE:
+			printk("  module: ");
 			break;
 		default:
-			printk("unused: ");
+			printk("  unused: ");
 			break;
 		}
 
-		printk("addr=0x%x%x, end=0x%x%x\n",
-		       (uint32_t)(entry[index].addr >> 32),
-		       (uint32_t)(entry[index].addr),
-		       (uint32_t)((entry[index].addr + entry[index].len) >> 32),
-		       (uint32_t)(entry[index].addr + entry[index].len));
+		printk("start=0x%x, end=0x%x\n", entry[index].start,
+				entry[index].end);
 	}
 
 	printk("No platform initialization defined\n");
