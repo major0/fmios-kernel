@@ -1,6 +1,8 @@
 #ifndef _FMIOS_TYPES_H
 #define _FMIOS_TYPES_H
 
+#ifndef __ASSEMBLY__
+
 #ifndef NULL
 #define NULL (void *)0
 #endif
@@ -28,5 +30,7 @@ typedef WINT_TYPE		wint_t;
 
 #include <stdint.h>
 #include <stdlib.h>
+
+#endif /* __ASSEMBLY__ */
 
 #endif /* _FMIOS_TYPES_H */

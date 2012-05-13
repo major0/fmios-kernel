@@ -17,7 +17,7 @@ fmios-kernel_sources += $(patsubst %,arch/$(ARCH)/%,$(arch_sources))
 all: fmios-kernel
 
 fmios-kernel: $(fmios-kernel_sources) $(LIBS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) $(fmios-kernel_sources) $(LIBS) -o fmios-kernel
+	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,-Ttext,$(arch_linkaddr) -Wl,--defsym,__kernel_start=$(arch_linkaddr) $(CPPFLAGS) $(fmios-kernel_sources) $(LIBS) -o fmios-kernel
 
 newlib/libc.a:
 	$(MAKE) -C newlib all || $(MAKE) -C newlib libc.a || exit 1

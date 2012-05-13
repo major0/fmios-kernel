@@ -26,8 +26,6 @@
 #endif
 
 /* FIXME these should go into a header file */
-#define PAGE_SIZE	4096
-#define STACK_SIZE	PAGE_SIZE
 #define F_CF    0x00000001      /* carry */
 #define F_PF    0x00000004      /* parity */
 #define F_AF    0x00000010      /* BCD stuff */
@@ -42,7 +40,7 @@
 #define F_RF    0x00010000      /* resume flag */
 #define F_VM    0x00020000      /* virtual 8086 */
 
-#include <fmios/config.h>
+#include <fmios/fmios.h>
 #include <multiboot.h>
 
 /* Entered through 32-bit task gate constructed in 16-bit mode

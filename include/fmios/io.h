@@ -3,6 +3,10 @@
 
 #include <asm/io.h>
 
+#ifndef __ASSEMBLY__
+
 void printk (const char *, ...);
+
+#endif /* __ASSEMBLY__ */
 
 #endif /* _FMIOS_IO_H */
