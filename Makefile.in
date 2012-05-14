@@ -5,19 +5,21 @@ CC=@CC@
 INSTALL=@INSTALL@
 RANLIB=@RANLIB@
 CPPFLAGS = -I$(srcdir)/arch/@ARCH@/include -I$(srcdir)/include
-CFLAGS = -Wall -Werror -static -ffreestanding -fno-common -fno-exceptions -fno-non-call-exceptions @CFLAGS@
+CFLAGS = -Wall -Werror -static -ffreestanding -fno-common -fno-exceptions -fno-non-call-exceptions
+#CFLAGS += -Wl,-Ttext,$(arch_linkaddr) -Wl,--defsym,__kernel_start=$(arch_linkaddr) @CFLAGS@
+CFLAGS += -Wl,--defsym,__kernel_start=$(arch_linkaddr) @CFLAGS@
 LDFLAGS	= @LDFLAGS@
 SUBDIRS	= arch/$(ARCH) newlib
 
 include arch/$(ARCH)/Arch.make
 
-fmios-kernel_sources = src/itoa.c src/printk.c src/multiboot.c src/8250.c src/ega.c
+fmios-kernel_sources = src/itoa.c src/printk.c src/multiboot.c src/init.c src/8250.c src/ega.c src/cmdline.c
 fmios-kernel_sources += $(patsubst %,arch/$(ARCH)/%,$(arch_sources))
 
 all: fmios-kernel
 
 fmios-kernel: $(fmios-kernel_sources) $(LIBS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,-Ttext,$(arch_linkaddr) -Wl,--defsym,__kernel_start=$(arch_linkaddr) $(CPPFLAGS) $(fmios-kernel_sources) $(LIBS) -o fmios-kernel
+	$(CC) $(CFLAGS) $(LDFLAGS) $(CPPFLAGS) $(fmios-kernel_sources) $(LIBS) -o fmios-kernel
 
 newlib/libc.a:
 	$(MAKE) -C newlib all || $(MAKE) -C newlib libc.a || exit 1
