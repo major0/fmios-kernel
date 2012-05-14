@@ -159,8 +159,8 @@ static void init_serial(char *cmdline)
 /* These routines are platform specific and must be defined to boot */
 static void __init_memory(struct pmap_table *pmap)
 {
-	int index;
 	struct pmap_entry *entry = pmap->entry;
+	int index;
 
 	printk("Page Mapping:\n");
 
@@ -226,29 +226,42 @@ static void * find_free_pages(size_t count)
 	}
 
 	/* FIXME is this address in valid memory? */
-	return (struct kconfig *)(pstart * PAGE_SIZE);
+	return (void *)(pstart * PAGE_SIZE);
 }
 
 static int pmap_shift(struct pmap_entry *entries, int count)
 {
-	int index = 0;
+	int total = 0;
+	int index;
+
+#ifdef CONFIG_ENABLE_DEBUG
+	printk("pmap_shift: shifting by %d\n", count);
+#endif
 
 	/* Figure out how many entries we have left */
-	while (entries[index+1].flags != MEMORY_PMAP_END) {
-		index++;
+	while (entries[total+1].flags != MEMORY_PMAP_END) {
+		total++;
+		if (total > 42) {
+			printk("pmap_shift: huge pmap?\n");
+		}
 	}
 
-	if (!index) {
-		printk("error: failed to shift page map %d\n", count);
+	if (!total) {
+		printk("error: failed to shift page map\n");
 		return 0;
 	}
 
-	while ((index-count) >= 0) {
-		if (entries[index-count].type) {
-			memcpy(&entries[index], &entries[index-count],
-				sizeof(struct pmap_entry));
+	/* This is something of a reverse memcpy as we are copying overlapping
+	 * regions */
+	while (count--) {
+		index = total - 1;
+		while ((index) >= 0) {
+			if (entries[index].type) {
+				memcpy(&entries[index+1], &entries[index],
+					sizeof(struct pmap_entry));
+			}
+			index--;
 		}
-		index--;
 	}
 
 	return 1;
@@ -257,104 +270,126 @@ static int pmap_shift(struct pmap_entry *entries, int count)
 /* Insert the given pmap entry into the existing pmap table.  We need to
  * properly split existing regions and reset the start/len elements with each
  * insert. */
-static int pmap_add(struct pmap_table *pmap, struct pmap_entry *entry)
+static int pmap_add(struct pmap_entry *entries, struct pmap_entry *entry, int index)
 {
-	struct pmap_entry *entries = &pmap->entry[0];
-	int index;
+	/* Sanity checking */
+	if (entries[index].type != MULTIBOOT_MEMORY_AVAILABLE) {
+		return 0;
+	}
+	if (entry->start > entries[index].end) {
+		return 0;
+	}
 
-	printk("pmap_add: start=0x%x, end=0x%x, type=0x%x, flags=0x%x\n",
+#ifdef CONFIG_ENABLE_DEBUG
+	printk("pmap_add:\n");
+	printk("  cur: start=0x%x, end=0x%x, type=0x%x, flags=0x%x\n",
+			entries[index].start, entries[index].end,
+			entries[index].type, entries[index].flags);
+	printk("  new: start=0x%x, end=0x%x, type=0x%x, flags=0x%x\n",
 			entry->start, entry->end, entry->type, entry->flags);
-	/* FIXME this loop needs some serious cleanup work */
-	for (index = 0; index < pmap->count; index++) {
+#endif
 
-		/* Avoid unusable memory */
-		if (entries[index].type != MULTIBOOT_MEMORY_AVAILABLE) {
-			continue;
-		}
+	/* Add the entry to the list in a sorted order.  We have 3 types of
+	 * insertions we can do.
+	 * 1) Insert this entry at the start of the current entry
+	 * 2) Insert this entry at the tail of the current entry
+	 * 3) Split the current entry in two and do the insertion.  */
 
-		if (entry->start > entries[index].end + 1) {
-			continue;
-		}
-		if (entry->end < entries[index].start) {
-			continue;
-		}
+	/* Consumes the start of this entry */
+	if (entry->start == entries[index].start &&
+	    entry->end >= entries[index].start) {
 
-		/* Prevent page overlap for pages with different types */
-		if (((entry->start <= entries[index].end
-				|| entry->end >= entries[index].start)
-				&& (entries[index].flags
-				 && (entries[index].flags != entry->flags)))
-		    || (entry->end >= entries[index+1].start
-				&& (entries[index+1].flags
-				 && entries[index].flags != entry->flags))) {
-			printk("error: pages overlap non-free regions\n");
-			return 0;
-		}
-
-		/* New used entry is at the start of the current map, either
-		 * the new entry is 1 page in size and of the same type, or the
-		 * existing page is part of a free region. */
-		if (entry->start == entries[index].start) {
-
-			/* Data that shares a page? */
-			if (entry->flags == entries[index].flags) {
-				break;
-			}
-
-			if (!pmap_shift(&entries[index], 1)) {
-				return 0;
-			}
-
-			entries[index].start = entry->start;
+		/* Extend the next current with the new entry */
+		if (entries[index].flags == entry->flags &&
+		    entries[index].end <= entry->end) {
 			entries[index].end = entry->end;
-			entries[index].type = entry->type;
-			entries[index].flags = entry->flags;
-
-			entries[index+1].start = entry->end + 1;
-			break;
-		}
-
-		/* New entry is at the tail of the current map */
-		if ((entry->start == entries[index].end ||
-		    (entry->start - 1) == entries[index].end)) {
-
-			/* Same type of memory, join regions */
-			if (entry->flags == entries[index].flags) {
-				entries[index].end = entry->end;
+			if (entries[index].start < entry->end) {
 				entries[index+1].start = entry->end + 1;
-				break;
 			}
-
-			/* Opertunistic merging with existing runs */
-			if (entry->flags == entries[index+1].flags &&
-			    (entry->end + 1) == entries[index+1].start) {
-				entries[index+1].start = entry->start;
-			}
-		}
-
-		/* Have to split the region, move all the entries after the
-		 * current entry up by 2 positions */
-		if (!pmap_shift(&entries[index+1], 2)) {
 			return 0;
 		}
 
-		/* Copy the new entry in splitting the old entry into 2
-		 * entries */
+		if (!pmap_shift(&entries[index], 1)) {
+			return -1;
+		}
+		entries[index].start = entry->start;
+		entries[index].end = entry->end;
+		entries[index].type = entry->type;
+		entries[index].flags = entry->flags;
+
+		entries[index+1].start = entry->end + 1;
+		return 1;
+	}
+
+	/* Consume the tail of the current entry */
+	if (entry->start <= entries[index].end &&
+	    entry->end >= entries[index].end) {
+
+		/* Merge with the current entry if the flags are the same */
+		/* FIXME do we need to merge the follow entry as well? */
+		if (entries[index].flags == entry->flags) {
+			entries[index].end = entry->end;
+			if (entries[index+1].type == MULTIBOOT_MEMORY_AVAILABLE
+			 && entries[index+1].start <= entry->end) {
+				entries[index+1].start = entry->end + 1;
+			}
+			return 0;
+		}
+
+		/* Merge the next entry with the new entry */
+		if (entries[index+1].flags == entry->flags &&
+		    entries[index+1].start >= entry->end) {
+			entries[index+1].start = entry->start;
+			entries[index].end = entry->start - 1;
+			return 0;
+		}
+
+		/* make space to add a new entry */
+		if (!pmap_shift(&entries[index], 1)) {
+			return -1;
+		}
+
+		entries[index].end = entry->start - 1;
 		entries[index+1].start = entry->start;
 		entries[index+1].end = entry->end;
 		entries[index+1].type = entry->type;
 		entries[index+1].flags = entry->flags;
 
-		/* Trailing segment of original memory */
-		entries[index+2].start = (entry->end + 1);
+		return 1;
+	}
+
+	/* Split the current entry in 2 and insert the new entry after
+	 * the current */
+	if (entry->start < entries[index].end &&
+	    entry->end > entries[index].start) {
+
+		/* This really shouldn't be possible */
+		if (entry->flags == entries[index].flags) {
+			printk("error: pmap_add() overlapping entries\n");
+			return -1;
+		}
+
+		if (!pmap_shift(&entries[index], 2)) {
+			return -1;
+		}
+
+		entries[index+2].start = entry->end + 1;
 		entries[index+2].end = entries[index].end;
 		entries[index+2].type = entries[index].type;
 		entries[index+2].flags = entries[index].flags;
 
-		entries[index].end = entries[index+1].start - 1;
-		break;
+		entries[index+1].start = entry->start;
+		entries[index+1].end = entry->end;
+		entries[index+1].type = entry->type;
+		entries[index+1].flags = entry->flags;
+
+		entries[index].end = entry->start - 1;
+
+		return 2;
 	}
-	return index;
+
+	printk("error: pmap_add bottomed out\n");
+	return -1;
 }
 
 static int __pmap_init(struct pmap_table *pmap)
@@ -362,61 +397,91 @@ static int __pmap_init(struct pmap_table *pmap)
 	struct pmap_entry *entries = pmap->entry;
 	struct pmap_entry new;
 	int index, entry_max;
-	int total;
+	int mod, mod_max;
+	int ret;
 
-	/* Initialize the mappings */
+	/* This loop makes 2 assumptions.
+	 * 1) That the memory map returned by multiboot is already ordered from
+	 *    start of memory (low address) to the end of memory (high address).
+	 * 2) That no memory mappings returned by multiboot contain overlapping
+	 *    regions.
+	 */
 	entry_max = mb_mmap_count();
+#ifdef CONFIG_ENABLE_DEBUG
 	printk("Initializing page map with %d entries\n", entry_max);
+#endif
 	for (index = 0; index < entry_max; index++) {
-		entries[index].start = PAGE_NUM(mb_mmap_start(index));
-		entries[index].end = PAGE_NUM(mb_mmap_end(index)) - 1;
-		entries[index].type = mb_mmap_type(index);
-		entries[index].flags = MEMORY_PMAP_UNUSED;
-		printk("pmap_init: start=0x%x, end=0x%x, type=0x%x, flags=0x%x\n",
-				entries[index].start, entries[index].end,
-				entries[index].type, entries[index].flags);
-	}
-	total = index;
+		if (!entries[index].type) {
+			entries[index].start = PAGE_NUM(mb_mmap_start(index));
+			entries[index].end = PAGE_NUM(mb_mmap_end(index)) - 1;
+			entries[index].type = mb_mmap_type(index);
+			entries[index].flags = MEMORY_PMAP_UNUSED;
 
-	/* Add a kernel mapping */
-	new.start = PAGE_NUM(kernel_start);
-	new.end = PAGE_NUM(kernel_end);
-	new.type = MULTIBOOT_MEMORY_AVAILABLE;
-	new.flags = MEMORY_PMAP_KERNEL;
-	if (!pmap_add(pmap, &new)) {
-		printk("error: failed to map the kernel\n");
-		return 0;
-	}
-	total++;
+#ifdef CONFIG_ENABLE_DEBUG
+			printk("pmap_init: start=0x%x, end=0x%x, type=0x%x, flags=0x%x\n",
+					entries[index].start, entries[index].end,
+					entries[index].type, entries[index].flags);
+#endif
+		}
 
-	/* Insert a mapping for the multiboot data */
-	new.start = PAGE_NUM(mb_mbi_start());
-	new.end = PAGE_NUM(mb_mbi_end());
-	new.type = MULTIBOOT_MEMORY_AVAILABLE;
-	new.flags = MEMORY_PMAP_LOADER;
-	if (!pmap_add(pmap, &new)) {
-		printk("error: failed to map multiboot information\n");
-		return 0;
-	}
-	total++;
+		if (entries[index].type != MULTIBOOT_MEMORY_AVAILABLE) {
+			continue;
+		}
 
-	/* Find any module data */
-	entry_max = mb_mod_count();
-	for (index = 0; index < entry_max; index++) {
-		new.start = PAGE_NUM(mb_mod_start(index));
-		new.end = PAGE_NUM(mb_mod_end(index));
-		new.type = MULTIBOOT_MEMORY_AVAILABLE;
-		new.flags = MEMORY_PMAP_MODULE;
+		if (PAGE_NUM(kernel_start) <= entries[index].end &&
+		    PAGE_NUM(kernel_start) >= entries[index].start) {
+			new.start = PAGE_NUM(kernel_start);
+			new.end = PAGE_NUM(kernel_end);
+			new.type = MULTIBOOT_MEMORY_AVAILABLE;
+			new.flags = MEMORY_PMAP_KERNEL;
 
-		if (!pmap_add(pmap, &new)) {
-			printk("error: failed to map module\n");
-			return 0;
+			ret = pmap_add(pmap->entry, &new, index);
+			if (ret < 0) {
+				printk("error: failed to map the kernel\n");
+				return 0;
+			}
+		}
+
+		if (PAGE_NUM(mb_mbi_start()) <= entries[index].end &&
+		    PAGE_NUM(mb_mbi_end()) >= entries[index].start) {
+			new.start = PAGE_NUM(mb_mbi_start());
+			new.end = PAGE_NUM(mb_mbi_end());
+			new.type = MULTIBOOT_MEMORY_AVAILABLE;
+			new.flags = MEMORY_PMAP_LOADER;
+
+			ret = pmap_add(pmap->entry, &new, index);
+			if (ret < 0) {
+				printk("error: failed to map multiboot information\n");
+				return 0;
+			}
+		}
+
+		/* Find any module data */
+		mod_max = mb_mod_count();
+		for (mod = 0; index < mod_max; mod++) {
+			if (PAGE_NUM(mb_mod_start(mod)) <= entries[index].end &&
+			    PAGE_NUM(mb_mod_end(mod)) >= entries[index].start) {
+				new.start = PAGE_NUM(mb_mod_start(mod));
+				new.end = PAGE_NUM(mb_mod_end(mod));
+				new.type = MULTIBOOT_MEMORY_AVAILABLE;
+				new.flags = MEMORY_PMAP_MODULE;
+
+				ret = pmap_add(pmap->entry, &new, index);
+				if (ret < 0) {
+					printk("error: failed to map module\n");
+					return 0;
+				}
+			}
 		}
 	}
-	total += index;
-	pmap->count = total;
 
-	return total;
+	index = 0;
+	while (entries[index].type) {
+		index++;
+	}
+	pmap->count = index;
+
+	return index;
 }
 
 /**
@@ -454,13 +519,15 @@ static struct pmap_table * pmap_init()
 
 		if (__pmap_init(pmap)) {
 			struct pmap_entry entry;
+			int ret;
 
 			entry.start = PAGE_NUM((unsigned long)pmap);
 			entry.end = PAGE_NUM((unsigned long)pmap + size);
 			entry.type = MULTIBOOT_MEMORY_AVAILABLE;
 			entry.flags = MEMORY_PMAP_KERNEL;
 
-			if (pmap_add(pmap, &entry)) {
+			ret = pmap_add(&pmap->entry[0], &entry, pmap->count);
+			if (ret >= 0) {
 				return pmap;
 			}
 		}
@@ -477,8 +544,6 @@ int fmios_init(unsigned long magic, unsigned long addr)
 {
 	struct pmap_table *pmap;
 	char *cmdline = "";
-
-	printk("FMIOS\n");
 
 	kernel_start = (unsigned long)&__kernel_start;
 	kernel_end = (unsigned long)&_end;
@@ -508,6 +573,8 @@ int fmios_init(unsigned long magic, unsigned long addr)
 			init_video(cmdline, &fb);
 		}
 	}
+
+	printk("FMIOS\n"); /* FIXME add version information */
 
 	/* Initialize a temporary page mapping to be used by the platform
 	 * specific init_memory() routine.  This map lists what memory is
