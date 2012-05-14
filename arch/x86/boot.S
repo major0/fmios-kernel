@@ -19,29 +19,15 @@
 
 #define __ASSEMBLY__
 
+#include <fmios/fmios.h>
+#include <fmios/page.h>
+#include <multiboot.h>
+
 #ifdef HAVE_ASM_USCORE
 # define EXT_C(sym)	_ ## sym
 #else
 # define EXT_C(sym)	sym
 #endif
-
-/* FIXME these should go into a header file */
-#define F_CF    0x00000001      /* carry */
-#define F_PF    0x00000004      /* parity */
-#define F_AF    0x00000010      /* BCD stuff */
-#define F_ZF    0x00000040      /* zero */
-#define F_SF    0x00000080      /* sign */
-#define F_TF    0x00000100      /* single step */
-#define F_IF    0x00000200      /* interrupts */
-#define F_DF    0x00000400      /* direction */
-#define F_OF    0x00000800      /* overflow */
-#define F_IOPL  0x00003000      /* IO privilege level */
-#define F_NT    0x00004000      /* nested task */
-#define F_RF    0x00010000      /* resume flag */
-#define F_VM    0x00020000      /* virtual 8086 */
-
-#include <fmios/fmios.h>
-#include <multiboot.h>
 
 /* Entered through 32-bit task gate constructed in 16-bit mode
  *
@@ -110,7 +96,7 @@ multiboot_entry:
 	pushl	%eax
 
         /* Enter mb_init() */
-        call    EXT_C(mb_init)
+        call    EXT_C(fmios_init)
 
         /* Halt. */
         pushl   $halt_message
@@ -122,12 +108,8 @@ halt:
         jmp     halt
 .data
 	.align 8
-idle_stack:
-	.space IDLE_STACK_SIZE
-	.global	idle_stack
-boot_message:
-	.asciz	"Booting..."
 halt_message:
-        .asciz  "Halted..."
+        .asciz  "System Halted."
 	/* Our global stack */
+	.align 8
 	.comm stack, STACK_SIZE

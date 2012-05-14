@@ -360,6 +360,33 @@ struct multiboot_tag_network
   uint8_t dhcpack[0];
 };
 
+int mb_init(unsigned long addr, unsigned long magic);
+
+char * mb_mbi_cmdline(void);
+unsigned long mb_mbi_start(void);
+unsigned long mb_mbi_len(void);
+unsigned long mb_mbi_end(void);
+
+int mb_mod_count(void);
+unsigned long mb_mod_start(int module);
+unsigned long mb_mod_len(int module);
+unsigned long mb_mod_end(int module);
+char * mb_mod_cmdline(int module);
+
+int mb_mmap_count(void);
+unsigned long mb_mmap_start(int mmap);
+unsigned long mb_mmap_len(int mmap);
+unsigned long mb_mmap_end(int mmap);
+uint32_t mb_mmap_type(int mmap);
+uint32_t mb_mmap_flags(int mmap);
+
+uint64_t mb_fb_addr(void);
+uint32_t mb_fb_pitch(void);
+uint32_t mb_fb_width(void);
+uint32_t mb_fb_height(void);
+uint8_t mb_fb_depth(void);
+uint8_t mb_fb_type(void);
+
 #endif /* ! __ASSEMBLY__ */
 
 #ifdef CONFIG_ENABLE_MULTIBOOT1
