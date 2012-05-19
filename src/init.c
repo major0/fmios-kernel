@@ -253,15 +253,13 @@ static int pmap_shift(struct pmap_entry *entries, int count)
 
 	/* This is something of a reverse memcpy as we are copying overlapping
 	 * regions */
-	while (count--) {
-		index = total - 1;
-		while ((index) >= 0) {
-			if (entries[index].type) {
-				memcpy(&entries[index+1], &entries[index],
-					sizeof(struct pmap_entry));
-			}
-			index--;
+	index = total - count;
+	while ((index) >= 0) {
+		if (entries[index].type) {
+			memcpy(&entries[index+count], &entries[index],
+				sizeof(struct pmap_entry));
 		}
+		index--;
 	}
 
 	return 1;
