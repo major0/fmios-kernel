@@ -209,7 +209,7 @@ static int pmap_add(struct pmap_entry *entries, struct pmap_entry *entry, int in
 	return -1;
 }
 
-static int __pmap_init(struct pmap_table *pmap)
+static int pmap_fill(struct pmap_table *pmap)
 {
 	struct pmap_entry *entries = pmap->entry;
 	struct pmap_entry new;
@@ -235,7 +235,7 @@ static int __pmap_init(struct pmap_table *pmap)
 			entries[index].flags = MEMORY_PMAP_UNUSED;
 
 #ifdef CONFIG_ENABLE_DEBUG
-			printk("pmap_init: start=0x%x, end=0x%x, type=0x%x, flags=0x%x\n",
+			printk("pmap_fill: start=0x%x, end=0x%x, type=0x%x, flags=0x%x\n",
 					entries[index].start, entries[index].end,
 					entries[index].type, entries[index].flags);
 #endif
@@ -334,7 +334,7 @@ struct pmap_table * init_malloc()
 		pmap->count = count;
 		pmap->entry[count].flags = MEMORY_PMAP_END;
 
-		if (__pmap_init(pmap)) {
+		if (pmap_fill(pmap)) {
 			struct pmap_entry entry;
 			int ret;
 
