@@ -1,6 +1,9 @@
 #ifndef _FMIOS_CONFIG_H
 #define _FMIOS_CONFIG_H
 
+#define PACKAGE_NAME	"@PACKAGE_NAME@"
+#define PACKAGE_VERSION	"@PACKAGE_VERSION@"
+
 /* Enable support for legacy Multiboot bootlaoders */
 #undef CONFIG_ENABLE_MULTIBOOT1
 

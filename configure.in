@@ -1,4 +1,4 @@
-AC_INIT([fmios-kernel], [0.1.1])
+AC_INIT([FMI/OS kernel], [0.1.1],,,[http://www.fmios.org])
 AC_CONFIG_AUX_DIR([.])
 AC_PREFIX_DEFAULT([])
 
@@ -29,6 +29,8 @@ AS_IF([test "x$enable_multiboot1" != xdisabled],
 	[AC_DEFINE([CONFIG_ENABLE_MULTIBOOT1], [1],
 		[Define to enable legacy Multiboot support])])
 
+AC_SUBST([PACKAGE_NAME])
+AC_SUBST([PACKAGE_VERSION])
 AC_CONFIG_HEADER([include/fmios/config.h])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
