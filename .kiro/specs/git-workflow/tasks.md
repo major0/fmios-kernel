@@ -25,7 +25,7 @@ Create foundational repository files and Git configuration to establish the deve
 
 Establish essential Git hooks to enforce workflow standards and prevent common mistakes.
 
-- [ ] 2.1 Create commit-msg hook for conventional commits
+- [x] 2.1 Create commit-msg hook for conventional commits
   - Validate commit message follows conventional commit format
   - Ensure task references are properly formatted
   - Provide helpful error messages with examples
