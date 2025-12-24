@@ -1,0 +1,28 @@
+# <type>(<scope>): <subject>
+#
+# <body>
+#
+# Task: <spec-name>#<task-number>
+#
+# Type should be one of the following:
+# * feat: A new feature
+# * fix: A bug fix
+# * docs: Documentation only changes
+# * style: Changes that do not affect the meaning of the code
+# * refactor: A code change that neither fixes a bug nor adds a feature
+# * test: Adding missing tests or correcting existing tests
+# * chore: Changes to the build process or auxiliary tools
+# * build: Changes that affect the build system or external dependencies
+# * ci: Changes to our CI configuration files and scripts
+#
+# Scope should reference the spec name or subsystem being modified
+#
+# Subject line should:
+# * use imperative, present tense: "change" not "changed" nor "changes"
+# * not capitalize first letter
+# * not end with a dot (.)
+#
+# Body should include motivation for the change and contrast with previous behavior
+#
+# Task reference should follow format: Task: <spec-name>#<task-number>
+# Example: Task: memory#2.1

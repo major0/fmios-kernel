@@ -1,0 +1,88 @@
+# Pre-commit configuration for FMI/OS Git workflow
+repos:
+  # Built-in pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-json
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  # Conventional commit message validation
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [
+          # Allow these commit types
+          "--types", "feat,fix,docs,style,refactor,test,chore,build,ci",
+          # Require scope (spec name or subsystem)
+          "--scopes", "memory,console,process,thread,namespace,ipc,slab,kernel,build,git-workflow",
+          # Optional scopes for flexibility
+          "--optional-scopes"
+        ]
+
+  # GPL v2 license header validation
+  - repo: local
+    hooks:
+      - id: license-header-check
+        name: Check GPL v2 license headers
+        entry: scripts/check-license-headers.sh
+        language: script
+        files: '\.(c|h)$'
+        pass_filenames: true
+
+  # Task reference validation in commit messages
+  - repo: local
+    hooks:
+      - id: task-reference-check
+        name: Validate task references in commit messages
+        entry: scripts/validate-task-reference.sh
+        language: script
+        stages: [commit-msg]
+        pass_filenames: false
+
+  # Branch name validation
+  - repo: local
+    hooks:
+      - id: branch-name-check
+        name: Validate branch naming convention
+        entry: scripts/validate-branch-name.sh
+        language: script
+        stages: [pre-push]
+        pass_filenames: false
+
+  # Prevent direct commits to main/master
+  - repo: local
+    hooks:
+      - id: protect-main-branch
+        name: Protect main/master branch
+        entry: scripts/protect-main-branch.sh
+        language: script
+        stages: [pre-commit]
+        pass_filenames: false
+
+  # Code style and formatting (when C files are present)
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v17.0.6
+    hooks:
+      - id: clang-format
+        files: '\.(c|h)$'
+        args: ['-style=file']
+
+  # Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        files: '\.(sh|bash)$'
+        args: ['--severity=warning']

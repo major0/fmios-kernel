@@ -1,0 +1,68 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C source and header files
+[*.{c,h}]
+indent_style = tab
+indent_size = 8
+max_line_length = 100
+
+# Assembly files
+[*.{s,S}]
+indent_style = tab
+indent_size = 8
+max_line_length = 100
+
+# Shell scripts
+[*.{sh,bash}]
+indent_style = tab
+indent_size = 8
+max_line_length = 100
+
+# Makefiles and autotools
+[{Makefile*,*.mk,*.am,*.ac,configure.ac}]
+indent_style = tab
+indent_size = 8
+
+# Markdown files
+[*.md]
+indent_style = space
+indent_size = 2
+max_line_length = 80
+trim_trailing_whitespace = false
+
+# YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# JSON files
+[*.json]
+indent_style = space
+indent_size = 2
+
+# Git configuration files
+[{.gitignore,.gitattributes,.gitmessage}]
+indent_style = space
+indent_size = 2
+
+# License and documentation
+[{LICENSE*,README*,CHANGELOG*}]
+indent_style = space
+indent_size = 2
+max_line_length = 80
+
+# Linker scripts
+[*.ld]
+indent_style = tab
+indent_size = 8
+max_line_length = 100

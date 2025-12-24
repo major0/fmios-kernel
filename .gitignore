@@ -1,0 +1,38 @@
+# IDE and Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+build/
+dist/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Autotools generated files
+autom4te.cache/
+config.log
+config.status
+configure
+Makefile.in
+Makefile
+aclocal.m4
+
+# Testing artifacts
+*.gcov
+*.gcda
+*.gcno
+coverage/
+test-results/
