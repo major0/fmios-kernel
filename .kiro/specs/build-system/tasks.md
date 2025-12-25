@@ -36,7 +36,7 @@ Create minimal build system supporting only x86_64 PVH ELF boot for Stage 1.
   - **Property 1: Basic x86_64 Build Functionality**
   - **Validates: Requirements 1.1, 1.2, 1.3**
 
-- [ ] 1.2 Fix build system to use fully qualified paths
+- [-] 1.2 Fix build system to use fully qualified paths
 **Priority: CRITICAL BLOCKER - Required to fix property test path resolution**
 **Dependencies: Task 1.1 (property test implementation)**
 

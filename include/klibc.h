@@ -28,6 +28,7 @@
 
 /* Kernel I/O functions (different semantics than standard library) */
 int kprintf(const char *format, ...);
+int kvprintf(const char *format, va_list args);
 int ksnprintf(char *str, size_t size, const char *format, ...);
 int kvsnprintf(char *str, size_t size, const char *format, va_list ap);
 

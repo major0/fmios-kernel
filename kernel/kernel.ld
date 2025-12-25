@@ -1,31 +1,49 @@
 /*
  * FMI/OS Kernel Linker Script
- * Stage 1: PVH ELF format for x86_64
+ * Stage 1: Multiboot2 format for GRUB bootloader
+ * Multiboot2 starts in 32-bit mode, transitions to 64-bit
  */
 
 ENTRY(_start)
 
 SECTIONS
 {
-	/* Load address for PVH ELF kernel */
-	. = 0x200000;
+	/* Multiboot2 load address - GRUB loads at 1MB by default */
+	. = 1M;
+
+	/* Multiboot2 header must be within first 32KB and early in the file */
+	.multiboot2 : ALIGN(8) {
+		*(.multiboot2)
+	}
+
+	/* 32-bit bootstrap code (Multiboot2 entry point) immediately after header */
+	.text : ALIGN(16) {
+		__text_start = .;
+		*(.text)
+		*(.text.*)
+		__text_end = .;
+	}
+
+	/* Page tables for long mode transition */
+	. = ALIGN(4K);
+	__page_tables_start = .;
+	. += 0x3000;                   /* Reserve space for PML4, PDPT, PD */
+	__page_tables_end = .;
 
 	/* Initialization code - can be freed after boot */
 	.init : ALIGN(4K) {
 		__init_start = .;
-		*arch/x86_64/bootstrap.o(.text)
-		*arch/x86_64/entry.o(.text)
 		*kernel/main.o(.text)
 		*(.init.text)
 		__init_end = .;
 	}
 
-	/* Runtime kernel code */
-	.text : ALIGN(4K) {
-		__text_start = .;
-		*(.text)
-		*(.text.*)
-		__text_end = .;
+	/* Global Descriptor Table and other data */
+	.data : ALIGN(4K) {
+		__data_start = .;
+		*(.data)
+		*(.data.*)
+		__data_end = .;
 	}
 
 	/* Read-only data */
@@ -34,14 +52,6 @@ SECTIONS
 		*(.rodata)
 		*(.rodata.*)
 		__rodata_end = .;
-	}
-
-	/* Initialized data */
-	.data : ALIGN(4K) {
-		__data_start = .;
-		*(.data)
-		*(.data.*)
-		__data_end = .;
 	}
 
 	/* Uninitialized data */
@@ -59,7 +69,6 @@ SECTIONS
 	/* Discard sections we don't need */
 	/DISCARD/ : {
 		*(.comment)
-		*(.note.*)
 		*(.eh_frame)
 		*(.eh_frame_hdr)
 	}
