@@ -80,63 +80,10 @@ When completing any task on a topic branch, follow this workflow:
    git push -u origin <branch-name>
    ```
 
-6. **MANDATORY: Create pull request immediately** - Use the GitHub URL provided after push
-
-## Pull Request Requirements
-
-**CRITICAL: Every pushed topic branch MUST have a pull request created immediately.**
-
-### Why PRs are Mandatory
-
-1. **Code Review**: All changes must be reviewed before merging
-2. **Quality Assurance**: Automated checks run on PRs
-3. **Documentation**: PRs provide context and discussion history
-4. **Traceability**: Clear record of what changed and why
-5. **Collaboration**: Team visibility into all changes
-
-### PR Creation Process
-
-After pushing your topic branch, GitHub provides a URL like:
-```
-Create a pull request for 'topic/your-branch' on GitHub by visiting:
-     https://github.com/major0/fmios-kernel/pull/new/topic/your-branch
-```
-
-**You MUST immediately visit this URL and create the PR.**
-
-### PR Requirements
-
-When creating the pull request:
-
-1. **Clear Title**: Use the same format as your commit message
-2. **Detailed Description**: Explain what changes were made and why
-3. **Task References**: Include links to relevant spec tasks
-4. **Testing Notes**: Describe how changes were tested
-5. **Breaking Changes**: Note any breaking changes or dependencies
-
-### Example PR Description Template
-```markdown
-## Summary
-Brief description of changes made.
-
-## Changes
-- List of specific changes
-- Another change made
-- Any configuration updates
-
-## Task References
-- Implements: spec-name#task-number
-- Related to: other-spec#task-number
-
-## Testing
-- [ ] Code compiles without errors
-- [ ] All existing tests pass
-- [ ] New functionality tested
-- [ ] Documentation updated if needed
-
-## Notes
-Any additional context or considerations.
-```
+6. **MANDATORY: Create pull request immediately using GitHub CLI**:
+   ```bash
+   gh pr create --title "feat(scope): description of changes" --body "Detailed description with task references"
+   ```
 
 ## Complete Example Workflow
 
@@ -169,9 +116,99 @@ Task: memory#2.1"
 # 7. Push topic branch
 git push -u origin topic/slab-allocator
 
-# 8. MANDATORY: Immediately create PR using the provided GitHub URL
-# Visit: https://github.com/major0/fmios-kernel/pull/new/topic/slab-allocator
+# 8. MANDATORY: Create pull request immediately using GitHub CLI
+gh pr create --title "feat(memory): implement slab allocator core functionality" \
+             --body "## Summary
+Implement core slab allocator functionality for kernel memory management.
+
+## Changes
+- Add slab cache creation and management
+- Implement object allocation and deallocation
+- Add size class optimization
+
+## Task References
+- Implements: memory#2.1
+
+## Testing
+- [x] Code compiles without errors
+- [x] Basic allocation tests pass
+- [x] Memory leak tests pass"
 ```
+
+## Pull Request Creation with GitHub CLI
+
+**CRITICAL: Every pushed topic branch MUST have a pull request created immediately using the GitHub CLI tool (`gh`).**
+
+### GitHub CLI Installation
+
+Ensure the GitHub CLI is installed and authenticated:
+```bash
+# Install GitHub CLI (if not already installed)
+# On macOS: brew install gh
+# On Ubuntu: sudo apt install gh
+# On other systems: see https://cli.github.com/
+
+# Authenticate with GitHub (one-time setup)
+gh auth login
+```
+
+### PR Creation Process
+
+After pushing your topic branch, immediately create a PR using the GitHub CLI:
+
+```bash
+# Basic PR creation
+gh pr create --title "feat(scope): description of changes" --body "Detailed description"
+
+# PR creation with comprehensive template
+gh pr create --title "feat(memory): implement slab allocator" \
+             --body "## Summary
+Implement core slab allocator functionality for kernel memory management.
+
+## Changes
+- Add slab cache creation and management
+- Implement object allocation and deallocation
+- Add size class optimization
+
+## Task References
+- Implements: memory#2.1
+
+## Testing
+- [x] Code compiles without errors
+- [x] Basic allocation tests pass
+- [x] Memory leak tests pass
+
+## Notes
+This implementation provides the foundation for efficient kernel memory allocation."
+```
+
+### GitHub CLI PR Options
+
+Useful `gh pr create` options:
+- `--title "Title"` - Set PR title (required)
+- `--body "Description"` - Set PR description (required)
+- `--draft` - Create as draft PR for work-in-progress
+- `--assignee @me` - Assign PR to yourself
+- `--label "enhancement"` - Add labels to PR
+- `--reviewer username` - Request specific reviewers
+
+### Why GitHub CLI is Preferred
+
+1. **Speed**: Create PRs directly from command line without browser
+2. **Consistency**: Standardized PR creation process
+3. **Automation**: Can be scripted and integrated into workflows
+4. **Efficiency**: No context switching between terminal and browser
+5. **Template Support**: Easy to use consistent PR templates
+
+### PR Requirements
+
+All pull requests MUST include:
+
+1. **Clear Title**: Use conventional commit format
+2. **Detailed Description**: Explain what changes were made and why
+3. **Task References**: Include links to relevant spec tasks
+4. **Testing Notes**: Describe how changes were tested
+5. **Breaking Changes**: Note any breaking changes or dependencies
 
 ## Commit Message Requirements
 
@@ -258,10 +295,13 @@ This workflow is enforced by:
 ❌ **Pushing directly to main**
 ✅ **Push topic branches and create PRs**
 
-❌ **Pushing topic branch without creating PR**
-✅ **Immediately create PR after every push**
+❌ **Creating PR through browser instead of CLI**
+✅ **Use gh pr create for immediate PR creation**
 
 ❌ **Forgetting task references in commits**
 ✅ **Include Task: spec-name#task-number**
 
-This Git workflow ensures high code quality, proper traceability, smooth collaboration, and complete visibility into all development work through mandatory pull requests.
+❌ **Pushing without immediately creating PR**
+✅ **Always run gh pr create right after git push**
+
+This Git workflow ensures high code quality, proper traceability, and smooth collaboration while preventing the most common integration issues through mandatory git pull requirements and streamlined PR creation via GitHub CLI.
