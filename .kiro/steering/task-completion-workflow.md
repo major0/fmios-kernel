@@ -80,7 +80,63 @@ When completing any task on a topic branch, follow this workflow:
    git push -u origin <branch-name>
    ```
 
-6. **Create pull request** - Use the GitHub URL provided after push
+6. **MANDATORY: Create pull request immediately** - Use the GitHub URL provided after push
+
+## Pull Request Requirements
+
+**CRITICAL: Every pushed topic branch MUST have a pull request created immediately.**
+
+### Why PRs are Mandatory
+
+1. **Code Review**: All changes must be reviewed before merging
+2. **Quality Assurance**: Automated checks run on PRs
+3. **Documentation**: PRs provide context and discussion history
+4. **Traceability**: Clear record of what changed and why
+5. **Collaboration**: Team visibility into all changes
+
+### PR Creation Process
+
+After pushing your topic branch, GitHub provides a URL like:
+```
+Create a pull request for 'topic/your-branch' on GitHub by visiting:
+     https://github.com/major0/fmios-kernel/pull/new/topic/your-branch
+```
+
+**You MUST immediately visit this URL and create the PR.**
+
+### PR Requirements
+
+When creating the pull request:
+
+1. **Clear Title**: Use the same format as your commit message
+2. **Detailed Description**: Explain what changes were made and why
+3. **Task References**: Include links to relevant spec tasks
+4. **Testing Notes**: Describe how changes were tested
+5. **Breaking Changes**: Note any breaking changes or dependencies
+
+### Example PR Description Template
+```markdown
+## Summary
+Brief description of changes made.
+
+## Changes
+- List of specific changes
+- Another change made
+- Any configuration updates
+
+## Task References
+- Implements: spec-name#task-number
+- Related to: other-spec#task-number
+
+## Testing
+- [ ] Code compiles without errors
+- [ ] All existing tests pass
+- [ ] New functionality tested
+- [ ] Documentation updated if needed
+
+## Notes
+Any additional context or considerations.
+```
 
 ## Complete Example Workflow
 
@@ -113,7 +169,8 @@ Task: memory#2.1"
 # 7. Push topic branch
 git push -u origin topic/slab-allocator
 
-# 8. Create pull request using the provided GitHub URL
+# 8. MANDATORY: Immediately create PR using the provided GitHub URL
+# Visit: https://github.com/major0/fmios-kernel/pull/new/topic/slab-allocator
 ```
 
 ## Commit Message Requirements
@@ -174,6 +231,7 @@ Direct pushes to protected branches will be rejected with:
 - **Clean History**: Linear history on main branch through proper workflow
 - **Rollback Safety**: Easy to revert problematic changes
 - **Consistent Baseline**: All work starts from the same up-to-date foundation
+- **Team Visibility**: PRs provide visibility into all ongoing work
 
 ## Enforcement
 
@@ -186,6 +244,7 @@ This workflow is enforced by:
 ### Manual Process Requirements
 - **Git pull mandate**: Must pull latest main before creating topic branches
 - **Task status updates**: Manual updates ensure developer awareness of progress
+- **PR creation mandate**: Every pushed topic branch must have an immediate PR
 - **Pull request reviews**: Human review ensures code quality and standards compliance
 
 ### Common Mistakes to Avoid
@@ -199,7 +258,10 @@ This workflow is enforced by:
 ❌ **Pushing directly to main**
 ✅ **Push topic branches and create PRs**
 
+❌ **Pushing topic branch without creating PR**
+✅ **Immediately create PR after every push**
+
 ❌ **Forgetting task references in commits**
 ✅ **Include Task: spec-name#task-number**
 
-This Git workflow ensures high code quality, proper traceability, and smooth collaboration while preventing the most common integration issues through mandatory git pull requirements.
+This Git workflow ensures high code quality, proper traceability, smooth collaboration, and complete visibility into all development work through mandatory pull requests.
