@@ -10,34 +10,34 @@ The IPC (Inter-Process Communication) subsystem provides Plan 9-style filesystem
 
 ```
 Userland Process → KFS Traversal → Service Discovery → Bind/Mount → IPC Library → IPC Messages → Auth → File Operations
-       ↓               ↓              ↓               ↓         ↓            ↓             ↓       ↓           ↓
-   open("//")    readdir/stat    find service    bind //svc /svc  kattach()  ATTACH msg  auth msgs  AUTH_READ/WRITE
+    ↓               ↓              ↓               ↓         ↓            ↓             ↓       ↓           ↓
+  open("//")    readdir/stat    find service    bind //svc /svc  kattach()  ATTACH msg  auth msgs  AUTH_READ/WRITE
 ```
 
 ### Service Discovery and Binding Model
 
 ```
 1. Discovery:
-   fd = open("//", O_RDONLY);
-   readdir(fd, entries, count);  // Discover available services
-   close(fd);
+  fd = open("//", O_RDONLY);
+  readdir(fd, entries, count);  // Discover available services
+  close(fd);
 
 2. Binding (userland command):
-   bind //proc /proc             // Command-line tool mounts service into local namespace
+  bind //proc /proc             // Command-line tool mounts service into local namespace
 
 3. Attachment (userland library function → IPC message):
-   fd = kattach("//proc");       // Library function sends ATTACH message to IPC subsystem
-                                 // Returns special fd for IPC operations
+  fd = kattach("//proc");       // Library function sends ATTACH message to IPC subsystem
+                      // Returns special fd for IPC operations
 
 4. Authentication (if required):
-   auth_fd = get_auth_interface(fd);      // Library function sends GET_AUTH message
-   perform_sasl_challenge(auth_fd);       // Library function sends AUTH_CHALLENGE messages
-   capability = complete_auth(auth_fd);   // Library function sends COMPLETE_AUTH message
+  auth_fd = get_auth_interface(fd);      // Library function sends GET_AUTH message
+  perform_sasl_challenge(auth_fd);       // Library function sends AUTH_CHALLENGE messages
+  capability = complete_auth(auth_fd);   // Library function sends COMPLETE_AUTH message
 
 5. File Operations:
-   data_fd = auth_open("/proc/1/status", O_RDONLY, capability);  // Sends AUTH_OPEN message
-   read(data_fd, buffer, size);                                  // Sends AUTH_READ message
-   close(data_fd);                                               // Sends AUTH_CLOSE message
+  data_fd = auth_open("/proc/1/status", O_RDONLY, capability);  // Sends AUTH_OPEN message
+  read(data_fd, buffer, size);                                  // Sends AUTH_READ message
+  close(data_fd);                                               // Sends AUTH_CLOSE message
 ```
 
 ### Namespace Protection
@@ -75,7 +75,7 @@ int kdetach(int service_fd);              /* Sends DETACH message type */
 /* Authentication interface */
 int get_auth_interface(int service_fd);   /* Sends GET_AUTH message type */
 int auth_challenge(int auth_fd, const void *challenge, size_t challenge_len,
-                   void *response, size_t *response_len);  /* Sends AUTH_CHALLENGE message type */
+        void *response, size_t *response_len);  /* Sends AUTH_CHALLENGE message type */
 capability_t complete_auth(int auth_fd);  /* Sends COMPLETE_AUTH message type */
 
 /* Authenticated file operations */
@@ -89,24 +89,24 @@ ssize_t auth_write(int fd, const void *buf, size_t count, capability_t cap);  /*
 ```c
 /* IPC message types handled by kernel IPC subsystem */
 enum ipc_message_type {
-    IPC_ATTACH = 1,           /* Service attachment request */
-    IPC_DETACH,               /* Service detachment request */
-    IPC_GET_AUTH,             /* Get authentication interface */
-    IPC_AUTH_CHALLENGE,       /* Authentication challenge/response */
-    IPC_COMPLETE_AUTH,        /* Complete authentication */
-    IPC_AUTH_OPEN,            /* Authenticated file open */
-    IPC_AUTH_READ,            /* Authenticated file read */
-    IPC_AUTH_WRITE,           /* Authenticated file write */
-    IPC_AUTH_CLOSE,           /* Authenticated file close */
-    IPC_AUTH_STAT,            /* Authenticated file stat */
+  IPC_ATTACH = 1,           /* Service attachment request */
+  IPC_DETACH,               /* Service detachment request */
+  IPC_GET_AUTH,             /* Get authentication interface */
+  IPC_AUTH_CHALLENGE,       /* Authentication challenge/response */
+  IPC_COMPLETE_AUTH,        /* Complete authentication */
+  IPC_AUTH_OPEN,            /* Authenticated file open */
+  IPC_AUTH_READ,            /* Authenticated file read */
+  IPC_AUTH_WRITE,           /* Authenticated file write */
+  IPC_AUTH_CLOSE,           /* Authenticated file close */
+  IPC_AUTH_STAT,            /* Authenticated file stat */
 };
 
 /* IPC message structure */
 struct ipc_message_s {
-    enum ipc_message_type type;
-    size_t payload_size;
-    capability_t capability;    /* For authenticated operations */
-    char payload[];            /* Variable-length payload */
+  enum ipc_message_type type;
+  size_t payload_size;
+  capability_t capability;    /* For authenticated operations */
+  char payload[];            /* Variable-length payload */
 } ipc_message_t;
 ```
 
@@ -114,21 +114,21 @@ struct ipc_message_s {
 
 ```c
 struct service_registration_s {
-    kobj_t kobj;                    /* Kernel object header */
-    char service_path[256];         /* Full KFS path (e.g., "//proc") */
-    char service_name[64];          /* Service name */
-    
-    /* Registration validation */
-    bool is_top_level;              /* Must be true for valid registration */
-    struct service_registration_s *parent; /* Must be NULL for top-level */
-    
-    /* Service capabilities */
-    bool requires_auth;             /* Service requires authentication */
-    auth_method_t auth_method;      /* SASL, capability-based, etc. */
-    
-    /* Service operations */
-    struct service_ops *ops;        /* Service-specific operations */
-    void *service_data;             /* Service private data */
+  kobj_t kobj;                    /* Kernel object header */
+  char service_path[256];         /* Full KFS path (e.g., "//proc") */
+  char service_name[64];          /* Service name */
+
+  /* Registration validation */
+  bool is_top_level;              /* Must be true for valid registration */
+  struct service_registration_s *parent; /* Must be NULL for top-level */
+
+  /* Service capabilities */
+  bool requires_auth;             /* Service requires authentication */
+  auth_method_t auth_method;      /* SASL, capability-based, etc. */
+
+  /* Service operations */
+  struct service_ops *ops;        /* Service-specific operations */
+  void *service_data;             /* Service private data */
 } service_registration_t;
 ```
 
@@ -136,18 +136,18 @@ struct service_registration_s {
 
 ```c
 struct client_attachment_s {
-    kobj_t kobj;                    /* Kernel object header */
-    process_t *client_process;      /* Attached client process */
-    service_registration_t *service; /* Target service */
-    
-    /* Attachment state */
-    enum attachment_state state;    /* DETACHED, ATTACHING, ATTACHED, AUTHENTICATED */
-    int auth_fd;                    /* Authentication file descriptor */
-    capability_t capability;        /* Authentication capability */
-    
-    /* Bound paths */
-    char local_path[256];           /* Local mount point */
-    char service_path[256];         /* Service KFS path */
+  kobj_t kobj;                    /* Kernel object header */
+  process_t *client_process;      /* Attached client process */
+  service_registration_t *service; /* Target service */
+
+  /* Attachment state */
+  enum attachment_state state;    /* DETACHED, ATTACHING, ATTACHED, AUTHENTICATED */
+  int auth_fd;                    /* Authentication file descriptor */
+  capability_t capability;        /* Authentication capability */
+
+  /* Bound paths */
+  char local_path[256];           /* Local mount point */
+  char service_path[256];         /* Service KFS path */
 } client_attachment_t;
 ```
 
@@ -180,22 +180,22 @@ pass_capability_fd(capability_to_fd(app_cap), app_process);
 ```c
 /* Capability restriction validation */
 bool can_restrict_capability(capability_t *original_cap, capability_restrictions_t *restrictions) {
-    // Can only remove permissions, not add them
-    if ((restrictions->permissions & ~original_cap->permissions) != 0) {
-        return false;
-    }
-    
-    // Can only set earlier expiry time
-    if (restrictions->expiry_time > original_cap->expiry_time) {
-        return false;
-    }
-    
-    // Can only restrict to subset of allowed paths
-    if (!is_path_subset(restrictions->allowed_paths, original_cap->allowed_paths)) {
-        return false;
-    }
-    
-    return true;
+  // Can only remove permissions, not add them
+  if ((restrictions->permissions & ~original_cap->permissions) != 0) {
+    return false;
+  }
+
+  // Can only set earlier expiry time
+  if (restrictions->expiry_time > original_cap->expiry_time) {
+    return false;
+  }
+
+  // Can only restrict to subset of allowed paths
+  if (!is_path_subset(restrictions->allowed_paths, original_cap->allowed_paths)) {
+    return false;
+  }
+
+  return true;
 }
 ```
 
@@ -206,15 +206,15 @@ Kernel Boot Sequence:
 3. Kernel starts init process
 4. Kernel grants init process the root capability
 5. Init process can now:
-   - Traverse entire "///" namespace
-   - Bind any service into its namespace
-   - Attach to any service
-   - Delegate reduced capabilities to child processes
+  - Traverse entire "///" namespace
+  - Bind any service into its namespace
+  - Attach to any service
+  - Delegate reduced capabilities to child processes
 
 Child Process Capability Flow:
 init (root "///" cap) → child1 (reduced cap) → grandchild (further reduced cap)
-                    → child2 (different reduced cap)
-                    → child3 (minimal cap)
+          → child2 (different reduced cap)
+          → child3 (minimal cap)
 ```
 
 ### Capability Delegation Example
@@ -239,28 +239,28 @@ int service_fd = auth_open("//proc", O_RDONLY, inherited_cap);
 
 ```c
 struct ipc_subsystem_s {
-    kobj_t kobj;                    /* Kernel object header */
-    
-    /* Service registry */
-    hash_table_t *services;         /* Registered services by path */
-    spinlock_t registry_lock;       /* Protects service registry */
-    
-    /* Client attachments */
-    hash_table_t *attachments;      /* Active client attachments */
-    spinlock_t attachment_lock;     /* Protects attachment table */
-    
-    /* Namespace bindings */
-    hash_table_t *bindings;         /* Process namespace bindings */
-    spinlock_t binding_lock;        /* Protects binding table */
-    
-    /* Statistics */
-    atomic_t services_registered;
-    atomic_t services_unregistered;
-    atomic_t attachments_created;
-    atomic_t attachments_destroyed;
-    atomic_t auth_challenges;
-    atomic_t auth_successes;
-    atomic_t auth_failures;
+  kobj_t kobj;                    /* Kernel object header */
+
+  /* Service registry */
+  hash_table_t *services;         /* Registered services by path */
+  spinlock_t registry_lock;       /* Protects service registry */
+
+  /* Client attachments */
+  hash_table_t *attachments;      /* Active client attachments */
+  spinlock_t attachment_lock;     /* Protects attachment table */
+
+  /* Namespace bindings */
+  hash_table_t *bindings;         /* Process namespace bindings */
+  spinlock_t binding_lock;        /* Protects binding table */
+
+  /* Statistics */
+  atomic_t services_registered;
+  atomic_t services_unregistered;
+  atomic_t attachments_created;
+  atomic_t attachments_destroyed;
+  atomic_t auth_challenges;
+  atomic_t auth_successes;
+  atomic_t auth_failures;
 } ipc_subsystem_t;
 
 /* Service registration validation */
@@ -275,12 +275,12 @@ service_registration_t *find_parent_service(const char *path);
 
 ```c
 enum attachment_state {
-    ATTACHMENT_DETACHED = 0,        /* No attachment */
-    ATTACHMENT_ATTACHING,           /* Attachment in progress */
-    ATTACHMENT_ATTACHED,            /* Attached but not authenticated */
-    ATTACHMENT_AUTHENTICATING,      /* Authentication in progress */
-    ATTACHMENT_AUTHENTICATED,       /* Fully authenticated */
-    ATTACHMENT_ERROR                /* Error state */
+  ATTACHMENT_DETACHED = 0,        /* No attachment */
+  ATTACHMENT_ATTACHING,           /* Attachment in progress */
+  ATTACHMENT_ATTACHED,            /* Attached but not authenticated */
+  ATTACHMENT_AUTHENTICATING,      /* Authentication in progress */
+  ATTACHMENT_AUTHENTICATED,       /* Fully authenticated */
+  ATTACHMENT_ERROR                /* Error state */
 };
 ```
 
@@ -288,10 +288,10 @@ enum attachment_state {
 
 ```c
 enum auth_method {
-    AUTH_NONE = 0,                  /* No authentication required */
-    AUTH_SASL,                      /* SASL challenge/response */
-    AUTH_CAPABILITY,                /* Capability-based */
-    AUTH_CUSTOM                     /* Service-specific method */
+  AUTH_NONE = 0,                  /* No authentication required */
+  AUTH_SASL,                      /* SASL challenge/response */
+  AUTH_CAPABILITY,                /* Capability-based */
+  AUTH_CUSTOM                     /* Service-specific method */
 };
 ```
 
@@ -299,19 +299,19 @@ enum auth_method {
 
 ```c
 struct capability_s {
-    uint64_t capability_id;         /* Unique capability identifier */
-    process_t *original_owner;      /* Process that originally obtained this capability */
-    process_t *current_owner;       /* Current process holding this capability */
-    service_registration_t *service; /* Service this capability grants access to */
-    uint32_t permissions;           /* Access permissions granted */
-    uint32_t delegatable_permissions; /* Permissions that can be delegated to children */
-    uint64_t expiry_time;           /* Capability expiration time */
-    uint32_t magic;                 /* Validation magic number */
-    
-    /* Inheritance chain */
-    struct capability_s *parent_cap; /* Parent capability (if inherited) */
-    list_t child_caps;              /* List of capabilities delegated from this one */
-    atomic_t ref_count;             /* Reference count for sharing */
+  uint64_t capability_id;         /* Unique capability identifier */
+  process_t *original_owner;      /* Process that originally obtained this capability */
+  process_t *current_owner;       /* Current process holding this capability */
+  service_registration_t *service; /* Service this capability grants access to */
+  uint32_t permissions;           /* Access permissions granted */
+  uint32_t delegatable_permissions; /* Permissions that can be delegated to children */
+  uint64_t expiry_time;           /* Capability expiration time */
+  uint32_t magic;                 /* Validation magic number */
+
+  /* Inheritance chain */
+  struct capability_s *parent_cap; /* Parent capability (if inherited) */
+  list_t child_caps;              /* List of capabilities delegated from this one */
+  atomic_t ref_count;             /* Reference count for sharing */
 } capability_t;
 ```
 
@@ -326,15 +326,15 @@ capability_t *restrict_capability_operations(capability_t *original_cap, uint32_
 
 /* Combined restriction */
 struct capability_restrictions_s {
-    uint32_t permissions;           /* Reduced permission set */
-    char **allowed_paths;           /* Restricted path list */
-    size_t path_count;              /* Number of allowed paths */
-    uint64_t expiry_time;           /* Earlier expiry time */
-    uint32_t allowed_operations;    /* Restricted operation set */
+  uint32_t permissions;           /* Reduced permission set */
+  char **allowed_paths;           /* Restricted path list */
+  size_t path_count;              /* Number of allowed paths */
+  uint64_t expiry_time;           /* Earlier expiry time */
+  uint32_t allowed_operations;    /* Restricted operation set */
 } capability_restrictions_t;
 
-capability_t *apply_restrictions(capability_t *original_cap, 
-                                capability_restrictions_t *restrictions);
+capability_t *apply_restrictions(capability_t *original_cap,
+                      capability_restrictions_t *restrictions);
 ```
 
 ### Permission Restriction Model
@@ -362,9 +362,9 @@ capability_t *restricted_cap = restrict_capability(original_cap, restricted_perm
 ```c
 /* Restrict capability to specific paths */
 const char *allowed_paths[] = {
-    "//proc/self/",     /* Only access to own process info */
-    "//kern/version",   /* Only kernel version info */
-    NULL
+  "//proc/self/",     /* Only access to own process info */
+  "//kern/version",   /* Only kernel version info */
+  NULL
 };
 
 capability_t *path_restricted_cap = restrict_capability_paths(original_cap, allowed_paths);
@@ -375,28 +375,28 @@ capability_t *path_restricted_cap = restrict_capability_paths(original_cap, allo
 ```c
 /* Container capability restriction example */
 struct container_capability_s {
-    capability_t base_cap;          /* Base capability structure */
-    
-    /* Container-specific restrictions */
-    char *chroot_path;              /* Restricted root path */
-    uint32_t namespace_mask;        /* Available namespace types */
-    uint64_t resource_limits;       /* Resource usage limits */
-    bool network_isolated;          /* Network isolation flag */
-    bool filesystem_readonly;       /* Read-only filesystem access */
+  capability_t base_cap;          /* Base capability structure */
+
+  /* Container-specific restrictions */
+  char *chroot_path;              /* Restricted root path */
+  uint32_t namespace_mask;        /* Available namespace types */
+  uint64_t resource_limits;       /* Resource usage limits */
+  bool network_isolated;          /* Network isolation flag */
+  bool filesystem_readonly;       /* Read-only filesystem access */
 } container_capability_t;
 
 /* Create container capability from parent */
 container_capability_t *create_container_capability(capability_t *parent_cap,
-                                                   const char *container_root,
-                                                   uint32_t restrictions);
+                                        const char *container_root,
+                                        uint32_t restrictions);
 ```
 
 ```c
 /* Capability inheritance operations */
-int inherit_capability(capability_t *parent_cap, process_t *child_process, 
-                      uint32_t reduced_permissions);
+int inherit_capability(capability_t *parent_cap, process_t *child_process,
+            uint32_t reduced_permissions);
 int delegate_capability(capability_t *cap, process_t *target_process,
-                       uint32_t delegated_permissions);
+            uint32_t delegated_permissions);
 int revoke_capability(capability_t *cap);
 
 /* File descriptor passing for capabilities */
@@ -412,19 +412,19 @@ int grant_init_capability(process_t *init_process, capability_t *root_cap);
 
 ```c
 struct process_capabilities_s {
-    kobj_t kobj;                    /* Kernel object header */
-    process_t *owner;               /* Owning process */
-    
-    /* Capability storage */
-    hash_table_t *capabilities;     /* Capabilities owned by this process */
-    spinlock_t cap_lock;            /* Protects capability table */
-    
-    /* Inheritance tracking */
-    list_t inherited_caps;          /* Capabilities inherited from parent */
-    list_t delegated_caps;          /* Capabilities delegated to children */
-    
-    /* Root namespace access */
-    capability_t *root_capability;  /* Capability for "///" namespace access */
+  kobj_t kobj;                    /* Kernel object header */
+  process_t *owner;               /* Owning process */
+
+  /* Capability storage */
+  hash_table_t *capabilities;     /* Capabilities owned by this process */
+  spinlock_t cap_lock;            /* Protects capability table */
+
+  /* Inheritance tracking */
+  list_t inherited_caps;          /* Capabilities inherited from parent */
+  list_t delegated_caps;          /* Capabilities delegated to children */
+
+  /* Root namespace access */
+  capability_t *root_capability;  /* Capability for "///" namespace access */
 } process_capabilities_t;
 ```
 
@@ -434,11 +434,11 @@ struct process_capabilities_s {
 
 ```c
 enum ipc_state {
-    IPC_DISCONNECTED = 0,           /* Channel not connected */
-    IPC_CONNECTING,                 /* Connection in progress */
-    IPC_CONNECTED,                  /* Active connection */
-    IPC_DISCONNECTING,              /* Disconnection in progress */
-    IPC_ERROR                       /* Error state */
+  IPC_DISCONNECTED = 0,           /* Channel not connected */
+  IPC_CONNECTING,                 /* Connection in progress */
+  IPC_CONNECTED,                  /* Active connection */
+  IPC_DISCONNECTING,              /* Disconnection in progress */
+  IPC_ERROR                       /* Error state */
 };
 ```
 
@@ -446,11 +446,11 @@ enum ipc_state {
 
 ```c
 struct ipc_mapping_s {
-    void *kernel_addr;              /* Kernel virtual address */
-    void *user_addr;                /* User virtual address */
-    size_t size;                    /* Mapping size */
-    int permissions;                /* Access permissions */
-    atomic_t ref_count;             /* Reference count */
+  void *kernel_addr;              /* Kernel virtual address */
+  void *user_addr;                /* User virtual address */
+  size_t size;                    /* Mapping size */
+  int permissions;                /* Access permissions */
+  atomic_t ref_count;             /* Reference count */
 } ipc_mapping_t;
 ```
 

@@ -99,33 +99,33 @@ The dual klibc implementation strategy enables comprehensive testing where the t
 #### Acceptance Criteria
 
 1. THE Kernel SHALL provide a `kernel/lib/` directory containing two distinct library categories:
-   - Core primitives library (synchronization, data structures, utilities)
-   - Kernel libc (klibc) located in `kernel/lib/c/` providing kernel-specific implementations of standard functions
+  - Core primitives library (synchronization, data structures, utilities)
+  - Kernel libc (klibc) located in `kernel/lib/c/` providing kernel-specific implementations of standard functions
 2. THE Core primitives library SHALL include synchronization primitives organized in separate source files:
-   - `spinlock.c` - Spinlock implementation using standard atomics
-   - NOTE: Read-write locks, mutexes and semaphores are NOT part of the core primitives library
-   - NOTE: Read-write locks, mutexes and semaphores will be implemented as part of the thread management system
+  - `spinlock.c` - Spinlock implementation using standard atomics
+  - NOTE: Read-write locks, mutexes and semaphores are NOT part of the core primitives library
+  - NOTE: Read-write locks, mutexes and semaphores will be implemented as part of the thread management system
 3. THE Kernel libc SHALL be located in `kernel/lib/c/` and provide kernel-specific implementations:
-   - `kprintf.c` - Kernel printf implementation for console output
-   - `klogf.c` - Kernel logging function with log levels and timestamps
-   - `kmem.c` - General-purpose memory operations (kmalloc, kfree, krealloc, kcalloc) that provide wrapper functions calling the kernel slab allocator
-   - `khalt.c` - System halt and panic functions (kpanic, kabort)
-   - All other standard functions (string, memory, math, conversion) are provided by compiler
+  - `kprintf.c` - Kernel printf implementation for console output
+  - `klogf.c` - Kernel logging function with log levels and timestamps
+  - `kmem.c` - General-purpose memory operations (kmalloc, kfree, krealloc, kcalloc) that provide wrapper functions calling the kernel slab allocator
+  - `khalt.c` - System halt and panic functions (kpanic, kabort)
+  - All other standard functions (string, memory, math, conversion) are provided by compiler
 4. THE Kernel SHALL compile as a standalone binary using only its own klibc implementation from `kernel/lib/c/`
 5. THE Testing framework SHALL provide an alternative klibc implementation in `tests/klibc/` that:
-   - Wraps standard libc calls for testing purposes
-   - Provides the same interface as the kernel klibc
-   - Enables unit testing of kernel code in userspace
-   - Implements exactly the same functions as the kernel klibc (no more, no less)
+  - Wraps standard libc calls for testing purposes
+  - Provides the same interface as the kernel klibc
+  - Enables unit testing of kernel code in userspace
+  - Implements exactly the same functions as the kernel klibc (no more, no less)
 6. THE Build system SHALL use different linker library paths to select the appropriate klibc:
-   - Kernel builds: Link against `kernel/lib/c/`
-   - Test builds: Link against `tests/klibc/`
+  - Kernel builds: Link against `kernel/lib/c/`
+  - Test builds: Link against `tests/klibc/`
 7. THE Kernel klibc SHALL NOT depend on any external libraries or system calls
 8. THE Testing klibc SHALL provide debugging and instrumentation capabilities not available in the kernel version
 9. BOTH kernel and testing klibc implementations SHALL implement exactly the same interface:
-   - Neither implementation may have extra functions beyond those declared in the shared header
-   - Neither implementation may omit functions declared in the shared header
-   - All function signatures MUST match exactly between implementations
+  - Neither implementation may have extra functions beyond those declared in the shared header
+  - Neither implementation may omit functions declared in the shared header
+  - All function signatures MUST match exactly between implementations
 
 #### TDD Test Requirements
 
@@ -366,7 +366,7 @@ The slab allocator follows Test-Driven Development with comprehensive tests writ
 #### Acceptance Criteria
 
 1. THE Memory_Detection_System SHALL support memory detection from UEFI bootloaders
-2. THE Memory_Detection_System SHALL support memory detection from Multiboot bootloaders  
+2. THE Memory_Detection_System SHALL support memory detection from Multiboot bootloaders
 3. THE Memory_Detection_System SHALL support memory detection from U-Boot bootloaders (ARM64/RISC-V)
 4. THE Memory_Detection_System SHALL parse bootloader memory maps to identify available, reserved, bad, and ACPI memory regions
 5. THE Memory_Detection_System SHALL provide a unified memory_map_t interface regardless of bootloader type

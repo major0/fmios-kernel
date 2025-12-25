@@ -51,11 +51,11 @@ The build system MUST provide ISO generation targets for multiboot2 kernels:
 ```makefile
 # Required target for multiboot2 testing
 fmios.iso: fmi-kernel grub.cfg
-	$(MAKE_ISO_SCRIPT) $@ $^
+  $(MAKE_ISO_SCRIPT) $@ $^
 
 # QEMU testing target
 qemu-test-multiboot2: fmios.iso
-	qemu-system-x86_64 -cdrom $< -serial mon:stdio -nographic
+  qemu-system-x86_64 -cdrom $< -serial mon:stdio -nographic
 ```
 
 ### GRUB Configuration Management
@@ -64,8 +64,8 @@ The build system MUST maintain proper GRUB configuration:
 ```bash
 # Example grub.cfg for multiboot2 kernel
 menuentry "FMI/OS Kernel" {
-    multiboot2 /boot/fmi-kernel
-    boot
+  multiboot2 /boot/fmi-kernel
+  boot
 }
 ```
 
@@ -81,8 +81,8 @@ POSIXLY_CORRECT='No bashing shell'
 
 # Verify ISO exists
 if ! test -f fmios.iso; then
-    echo "ERROR: fmios.iso not found - required for multiboot2 testing"
-    exit 1
+  echo "ERROR: fmios.iso not found - required for multiboot2 testing"
+  exit 1
 fi
 
 # Use GRUB bootloader (REQUIRED)
@@ -130,22 +130,22 @@ The build system MUST validate multiboot2 compliance:
 ```bash
 # Validate multiboot2 header presence
 check_multiboot2_header() {
-    if objdump -h fmi-kernel | grep -q ".multiboot2"; then
-        echo "Multiboot2 header found - GRUB bootloader required"
-        return 0
-    fi
-    return 1
+  if objdump -h fmi-kernel | grep -q ".multiboot2"; then
+    echo "Multiboot2 header found - GRUB bootloader required"
+    return 0
+  fi
+  return 1
 }
 
 # Enforce GRUB usage for multiboot2 targets
 validate_qemu_invocation() {
-    if check_multiboot2_header; then
-        if echo "$QEMU_CMD" | grep -q "\-kernel"; then
-            echo "ERROR: Multiboot2 kernel detected but using -kernel flag"
-            echo "REQUIRED: Use GRUB bootloader with ISO image"
-            exit 1
-        fi
+  if check_multiboot2_header; then
+    if echo "$QEMU_CMD" | grep -q "\-kernel"; then
+      echo "ERROR: Multiboot2 kernel detected but using -kernel flag"
+      echo "REQUIRED: Use GRUB bootloader with ISO image"
+      exit 1
     fi
+  fi
 }
 ```
 
@@ -156,9 +156,9 @@ All continuous integration MUST enforce this standard:
 # Example CI configuration
 test_multiboot2:
   script:
-    - make fmios.iso
-    - ./scripts/validate-multiboot2-qemu.sh
-    - qemu-system-x86_64 -cdrom fmios.iso -serial mon:stdio -nographic -monitor none
+  - make fmios.iso
+  - ./scripts/validate-multiboot2-qemu.sh
+  - qemu-system-x86_64 -cdrom fmios.iso -serial mon:stdio -nographic -monitor none
 ```
 
 ## Rationale
@@ -195,18 +195,18 @@ Scripts MUST detect and prevent incorrect usage:
 ```bash
 # Detect multiboot2 kernel and enforce GRUB usage
 detect_multiboot2_violation() {
-    local qemu_cmd="$1"
-    
-    # Check if kernel has multiboot2 header
-    if objdump -s -j .multiboot2 fmi-kernel >/dev/null 2>&1; then
-        # Multiboot2 kernel detected
-        if echo "$qemu_cmd" | grep -q "\-kernel"; then
-            echo "VIOLATION: Multiboot2 kernel using -kernel flag"
-            echo "REQUIRED: qemu-system-x86_64 -cdrom fmios.iso -serial mon:stdio -nographic"
-            return 1
-        fi
+  local qemu_cmd="$1"
+
+  # Check if kernel has multiboot2 header
+  if objdump -s -j .multiboot2 fmi-kernel >/dev/null 2>&1; then
+    # Multiboot2 kernel detected
+    if echo "$qemu_cmd" | grep -q "\-kernel"; then
+      echo "VIOLATION: Multiboot2 kernel using -kernel flag"
+      echo "REQUIRED: qemu-system-x86_64 -cdrom fmios.iso -serial mon:stdio -nographic"
+      return 1
     fi
-    return 0
+  fi
+  return 0
 }
 ```
 
@@ -214,17 +214,17 @@ detect_multiboot2_violation() {
 ```makefile
 # Validate QEMU command for multiboot2 compliance
 validate-qemu-multiboot2:
-	@if objdump -s -j .multiboot2 fmi-kernel >/dev/null 2>&1; then \
-		echo "Multiboot2 kernel detected - validating QEMU usage..."; \
-		if test "$(QEMU_FLAGS)" != "-cdrom fmios.iso -serial mon:stdio -nographic"; then \
-			echo "ERROR: Invalid QEMU flags for multiboot2 kernel"; \
-			echo "REQUIRED: -cdrom fmios.iso -serial mon:stdio -nographic"; \
-			exit 1; \
-		fi; \
-	fi
+  @if objdump -s -j .multiboot2 fmi-kernel >/dev/null 2>&1; then \
+    echo "Multiboot2 kernel detected - validating QEMU usage..."; \
+    if test "$(QEMU_FLAGS)" != "-cdrom fmios.iso -serial mon:stdio -nographic"; then \
+      echo "ERROR: Invalid QEMU flags for multiboot2 kernel"; \
+      echo "REQUIRED: -cdrom fmios.iso -serial mon:stdio -nographic"; \
+      exit 1; \
+    fi; \
+  fi
 
 qemu-test: validate-qemu-multiboot2 fmios.iso
-	qemu-system-x86_64 -cdrom fmios.iso -serial mon:stdio -nographic
+  qemu-system-x86_64 -cdrom fmios.iso -serial mon:stdio -nographic
 ```
 
 ## Documentation Requirements

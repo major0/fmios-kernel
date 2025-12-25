@@ -1,8 +1,9 @@
 # Clang-format configuration for FMI/OS
+# Aligned with .editorconfig settings
 BasedOnStyle: LLVM
-IndentWidth: 4
-TabWidth: 4
-UseTab: Never
+IndentWidth: 8
+TabWidth: 8
+UseTab: Always
 ColumnLimit: 100
 BreakBeforeBraces: Linux
 AlignConsecutiveAssignments: false
@@ -17,7 +18,7 @@ BinPackParameters: true
 BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
 BreakStringLiterals: true
-ContinuationIndentWidth: 4
+ContinuationIndentWidth: 8
 IndentCaseLabels: true
 IndentPPDirectives: None
 KeepEmptyLinesAtTheStartOfBlocks: false

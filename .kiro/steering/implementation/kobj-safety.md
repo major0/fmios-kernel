@@ -49,7 +49,7 @@ The kernel provides thread-safe data structures that integrate with kobj:
 To prevent deadlocks, all kobj-safe data structures follow a strict lock hierarchy:
 
 1. **Global Subsystem Locks** (highest priority)
-2. **Owner Object Locks** (medium priority)  
+2. **Owner Object Locks** (medium priority)
 3. **Data Structure Locks** (lowest priority)
 
 **Rule**: Always acquire locks in order from highest to lowest priority.
@@ -249,7 +249,7 @@ list_init(&list, &owner_kobj);
 // lib/kobj.c MUST use lib/spinlock.c functions
 #include "sync.h"  // For spinlock functions
 
-// lib/lists.c MUST use lib/spinlock.c functions  
+// lib/lists.c MUST use lib/spinlock.c functions
 #include "sync.h"  // For spinlock functions
 
 // kernel/*.c MUST use lib/*.c functions

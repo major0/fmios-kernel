@@ -13,22 +13,22 @@ All development work MUST follow the established Git workflow to maintain code q
 ### Before Starting Any Work
 
 1. **Ensure you're on main branch**:
-   ```bash
-   git checkout main
-   git pull origin main
-   ```
+  ```bash
+  git checkout main
+  git pull origin main
+  ```
 
 2. **Create a topic branch** using the provided script:
-   ```bash
-   ./scripts/create-topic-branch.sh <type> <name> [task-reference]
-   ```
+  ```bash
+  ./scripts/create-topic-branch.sh <type> <name> [task-reference]
+  ```
 
 3. **Examples**:
-   ```bash
-   ./scripts/create-topic-branch.sh topic memory-allocator memory#2.1
-   ./scripts/create-topic-branch.sh fix console-buffer-overflow console#4.2
-   ./scripts/create-topic-branch.sh docs build-instructions build-system#1
-   ```
+  ```bash
+  ./scripts/create-topic-branch.sh topic memory-allocator memory#2.1
+  ./scripts/create-topic-branch.sh fix console-buffer-overflow console#4.2
+  ./scripts/create-topic-branch.sh docs build-instructions build-system#1
+  ```
 
 ### Branch Types
 
@@ -48,27 +48,27 @@ When completing any task on a topic branch, follow this workflow:
 1. **Complete the implementation** - Finish all code changes for the task
 
 2. **Update task status** - Manually change the task status in the spec file:
-   - Change `- [ ]` to `- [-]` when starting work (in progress)
-   - Change `- [-]` to `- [x]` when completing work (completed)
+  - Change `- [ ]` to `- [-]` when starting work (in progress)
+  - Change `- [-]` to `- [x]` when completing work (completed)
 
 3. **Stage all changes** - Add both implementation files AND the updated spec file:
-   ```bash
-   git add .
-   ```
+  ```bash
+  git add .
+  ```
 
 4. **Commit with proper format** - Use conventional commit format with task reference:
-   ```bash
-   git commit -m "feat(scope): description of changes
+  ```bash
+  git commit -m "feat(scope): description of changes
 
-   Detailed description if needed.
+  Detailed description if needed.
 
-   Task: spec-name#task-number"
-   ```
+  Task: spec-name#task-number"
+  ```
 
 5. **Push topic branch**:
-   ```bash
-   git push -u origin <branch-name>
-   ```
+  ```bash
+  git push -u origin <branch-name>
+  ```
 
 6. **Create pull request** - Use the GitHub URL provided after push
 
@@ -168,9 +168,9 @@ All changes MUST be submitted via pull requests:
 4. **Commit with proper format** including task references
 5. **Push topic branch** to origin
 6. **Create pull request** with:
-   - Clear description of changes
-   - Task references in description
-   - Link to relevant spec tasks
+  - Clear description of changes
+  - Task references in description
+  - Link to relevant spec tasks
 
 ## Benefits
 

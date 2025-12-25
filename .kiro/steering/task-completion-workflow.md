@@ -15,18 +15,18 @@ All development work MUST follow the established Git workflow to maintain code q
 **SIMPLIFIED WORKFLOW** for creating topic branches:
 
 1. **Create topic branch directly** with proper naming and upstream tracking:
-   ```bash
-   git checkout -b <type>/<descriptive-name> origin/main
-   ```
+  ```bash
+  git checkout -b <type>/<descriptive-name> origin/main
+  ```
 
 2. **Pull latest changes** to ensure branch is up-to-date:
-   ```bash
-   git pull
-   ```
+  ```bash
+  git pull
+  ```
 
 ### Branch Types
 - **topic** - New features or enhancements
-- **fix** - Bug fixes  
+- **fix** - Bug fixes
 - **docs** - Documentation updates
 - **refactor** - Code refactoring
 - **test** - Test improvements
@@ -67,32 +67,32 @@ When completing any task on a topic branch, follow this workflow:
 1. **Complete the implementation** - Finish all code changes for the task
 
 2. **Update task status** - Manually change the task status in the spec file:
-   - Change `- [ ]` to `- [-]` when starting work (in progress)
-   - Change `- [-]` to `- [x]` when completing work (completed)
+  - Change `- [ ]` to `- [-]` when starting work (in progress)
+  - Change `- [-]` to `- [x]` when completing work (completed)
 
 3. **Stage all changes** - Add both implementation files AND the updated spec file:
-   ```bash
-   git add .
-   ```
+  ```bash
+  git add .
+  ```
 
 4. **Commit with proper format** - Use conventional commit format with task reference:
-   ```bash
-   git commit -m "feat(scope): description of changes
+  ```bash
+  git commit -m "feat(scope): description of changes
 
-   Detailed description if needed.
+  Detailed description if needed.
 
-   Task: spec-name#task-number"
-   ```
+  Task: spec-name#task-number"
+  ```
 
 5. **Push topic branch**:
-   ```bash
-   git push -u origin <branch-name>
-   ```
+  ```bash
+  git push -u origin <branch-name>
+  ```
 
 6. **MANDATORY: Create pull request immediately using GitHub CLI**:
-   ```bash
-   gh pr create --title "feat(scope): description of changes" --body "Detailed description with task references"
-   ```
+  ```bash
+  gh pr create --title "feat(scope): description of changes" --body "Detailed description with task references"
+  ```
 
 ## Complete Example Workflow
 
@@ -126,7 +126,7 @@ git push -u origin topic/slab-allocator
 
 # 8. MANDATORY: Create pull request immediately using GitHub CLI
 gh pr create --title "feat(memory): implement slab allocator core functionality" \
-             --body "## Summary
+      --body "## Summary
 Implement core slab allocator functionality for kernel memory management.
 
 ## Changes
@@ -170,7 +170,7 @@ gh pr create --title "feat(scope): description of changes" --body "Detailed desc
 
 # PR creation with comprehensive template
 gh pr create --title "feat(memory): implement slab allocator" \
-             --body "## Summary
+      --body "## Summary
 Implement core slab allocator functionality for kernel memory management.
 
 ## Changes

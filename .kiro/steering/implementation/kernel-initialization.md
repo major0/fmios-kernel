@@ -89,10 +89,10 @@ After scheduler startup:
 void free_init_memory(void) {
     extern char __init_start[], __init_end[];
     size_t init_size = __init_end - __init_start;
-    
+
     // Mark initialization pages as free
     free_pages(__init_start, init_size);
-    
+
     klogf(KLOG_INFO, "Freed %zu bytes of initialization code", init_size);
 }
 ```
@@ -112,7 +112,7 @@ static int memory_init(void) {
 }
 
 static int process_init(void) {
-    // Initialize process management subsystem  
+    // Initialize process management subsystem
     // Call functions from kernel/process.c as needed
     return process_subsystem_setup(); // Implemented in kernel/process.c
 }
@@ -146,15 +146,15 @@ void kmain(void) {
     if (memory_init() != 0) {
         kpanic("Memory initialization failed");
     }
-    
+
     if (process_init() != 0) {
         kpanic("Process initialization failed");
     }
-    
+
     // Continue with other initializers...
-    
+
     start_scheduler();
-    
+
     // This point should never be reached
     kpanic("Scheduler returned unexpectedly");
 }
@@ -212,10 +212,10 @@ Architecture-specific bootstrap code calls into `main.c`:
 _start:
     # Set up stack
     mov $kernel_stack_top, %rsp
-    
+
     # Call main kernel entry point
     call kmain
-    
+
     # Should never return
     hlt
 ```

@@ -148,69 +148,69 @@ User-space services register in the `//` namespace and manage their own hierarch
 //kern/           - Kernel information (kernel-provided)
 //scsi/           - SCSI subsystem (unified block device interface)
   ├── host0/     - SCSI host adapter 0
-    ├── 0:0:0:0/ - SCSI device (host:channel:target:lun)
-      ├── block  - Block device interface
-      ├── part1  - Partition 1
-      ├── part2  - Partition 2
-      ├── model  - Device model (SCSI INQUIRY data)
-      ├── vendor - Vendor information (SCSI INQUIRY data)
-      ├── serial - Serial number (SCSI INQUIRY data)
-      ├── wwn    - World Wide Name (if available)
-      ├── scsi_id - SCSI identifier string
-      └── primary -> part1  - Symlink to primary partition
-    └── 0:0:1:0/ - Second SCSI device
+  ├── 0:0:0:0/ - SCSI device (host:channel:target:lun)
+    ├── block  - Block device interface
+    ├── part1  - Partition 1
+    ├── part2  - Partition 2
+    ├── model  - Device model (SCSI INQUIRY data)
+    ├── vendor - Vendor information (SCSI INQUIRY data)
+    ├── serial - Serial number (SCSI INQUIRY data)
+    ├── wwn    - World Wide Name (if available)
+    ├── scsi_id - SCSI identifier string
+    └── primary -> part1  - Symlink to primary partition
+  └── 0:0:1:0/ - Second SCSI device
 //block/          - Legacy block device compatibility layer
   ├── sda -> ../scsi/host0/0:0:0:0/block  - Compatibility symlink
   └── sdb -> ../scsi/host0/0:0:1:0/block  - Compatibility symlink
 //net/device/     - Network device services
   ├── eth0/      - Ethernet interface
-    ├── stats    - Interface statistics
-    ├── config   - Configuration interface
-    └── link     - Link status
+  ├── stats    - Interface statistics
+  ├── config   - Configuration interface
+  └── link     - Link status
   └── wlan0/     - Wireless interface
-    ├── stats    - Interface statistics
-    ├── config   - Configuration interface
-    └── signal   - Signal strength
+  ├── stats    - Interface statistics
+  ├── config   - Configuration interface
+  └── signal   - Signal strength
 //net/ipv4/       - IPv4 protocol endpoints
   ├── 192.168.1.100/
-    ├── 80/      - HTTP server endpoint
-    ├── 443/     - HTTPS server endpoint
-    └── 22/      - SSH server endpoint
+  ├── 80/      - HTTP server endpoint
+  ├── 443/     - HTTPS server endpoint
+  └── 22/      - SSH server endpoint
   └── 0.0.0.0/   - Wildcard address
-    └── 53/      - DNS server endpoint
+  └── 53/      - DNS server endpoint
 //net/ipv6/       - IPv6 protocol endpoints
   ├── ::1/       - Loopback address
-    └── 22/      - SSH server endpoint
+  └── 22/      - SSH server endpoint
   └── ::/        - Wildcard address
-    └── 53/      - DNS server endpoint
+  └── 53/      - DNS server endpoint
 //net/unix/       - Unix domain sockets
   ├── stream/    - Stream sockets
   └── dgram/     - Datagram sockets
 //rdma/           - RDMA device services
   ├── mlx5_0/    - Mellanox ConnectX RDMA device
-    ├── verbs    - RDMA verbs interface
-    ├── stats    - Performance statistics
-    └── config   - Device configuration
+  ├── verbs    - RDMA verbs interface
+  ├── stats    - Performance statistics
+  └── config   - Device configuration
   └── roce0/     - RoCE (RDMA over Converged Ethernet) device
 //tty/            - Terminal and character stream services
   ├── console    - System console (character stream)
   ├── tty1       - Virtual terminal 1 (character stream)
   ├── tty2       - Virtual terminal 2 (character stream)
   └── pts/       - Pseudo-terminal slaves
-    ├── 0        - PTY slave 0 (character stream)
-    └── 1        - PTY slave 1 (character stream)
+  ├── 0        - PTY slave 0 (character stream)
+  └── 1        - PTY slave 1 (character stream)
 //input/          - Input device services
   ├── keyboard0  - USB keyboard (character stream)
   ├── mouse0     - USB mouse (character stream)
   ├── touchpad0  - Touchpad device (character stream)
   └── event/     - Raw input events
-    ├── kbd      - Keyboard events
-    └── mouse    - Mouse events
+  ├── kbd      - Keyboard events
+  └── mouse    - Mouse events
 //usb/            - USB device services
   ├── bus0/      - USB bus 0
-    ├── 001      - USB device 001 (keyboard)
-    ├── 002      - USB device 002 (mouse)
-    └── hub      - USB hub information
+  ├── 001      - USB device 001 (keyboard)
+  ├── 002      - USB device 002 (mouse)
+  └── hub      - USB hub information
   └── bus1/      - USB bus 1
 //swap/           - Swap services
 //fs/             - Filesystem services
@@ -243,7 +243,7 @@ Code Quality Enforcement:
 │  - Check against existing headers   │
 │  - Generate compiler warnings/errors│
 └─────────────────────────────────────┘
-    ↓
+  ↓
 ┌─────────────────────────────────────┐
 │  Header Dependency Validation      │
 │  - Verify proper #include usage    │
@@ -329,7 +329,7 @@ TDD Bootloader Memory Detection Flow:
 │  - Tests validate bootloader data preservation │  ← Memory maps, system tables
 │  - Tests define memory_detect_init() behavior │
 └─────────────────────────────────────┘
-    ↓
+  ↓
 ┌─────────────────────────────────────┐
 │  Memory Detection System (Tested First) │
 │  - Tests define bootloader memory map parsing │  ← Protocol-specific parsing
@@ -337,7 +337,7 @@ TDD Bootloader Memory Detection Flow:
 │  - Tests define totals and statistics calculation │  ← Total, usable, highest address
 │  - Tests validate thread-safe access │  ← Spinlock protection
 └─────────────────────────────────────┘
-    ↓
+  ↓
 ┌─────────────────────────────────────┐
 │  Page Allocator Initialization (Tested First) │
 │  - Tests define required table size calculation │  ← Based on total memory
@@ -374,7 +374,7 @@ TDD Boot Parameter Processing Flow:
 │  - Tests validate command line location │  ← Protocol-specific locations
 │  - Tests define cmdline_capture_init() behavior │
 └─────────────────────────────────────┘
-    ↓
+  ↓
 ┌─────────────────────────────────────┐
 │  Command Line Capture System (Tested First) │
 │  - Tests validate cmdline copy to kernel memory │  ← Safe from bootloader changes
@@ -382,7 +382,7 @@ TDD Boot Parameter Processing Flow:
 │  - Tests validate boolean flag handling │  ← debug, quiet, verbose
 │  - Tests define thread-safe access │  ← Spinlock protection
 └─────────────────────────────────────┘
-    ↓
+  ↓
 ┌─────────────────────────────────────┐
 │  Parameter Access Interface (Tested First) │
 │  - Tests validate cmdline_get_param() lookups │  ← By parameter name
@@ -420,7 +420,7 @@ TDD PVH ELF Boot Flow:
 │  - Tests validate XEN_ELFNOTE_ENTRY note │  ← 64-bit entry point note
 │  - Tests define note section placement │  ← ELF notes section
 └─────────────────────────────────────┘
-    ↓
+  ↓
 ┌─────────────────────────────────────┐
 │  32-bit Entry Point (Tested First)  │
 │  - Tests define PVH start info detection │  ← EBX register validation
@@ -429,7 +429,7 @@ TDD PVH ELF Boot Flow:
 │  - Tests validate GDT setup │  ← 64-bit code/data segments
 │  - Tests define mode transition sequence │  ← PAE, EFER, paging enable
 └─────────────────────────────────────┘
-    ↓
+  ↓
 ┌─────────────────────────────────────┐
 │  64-bit Entry Point (Tested First)  │
 │  - Tests validate existing 64-bit mode │  ← EFER MSR validation
@@ -472,7 +472,7 @@ TDD Boot Protocol Flow:
 │  - Tests define header placement     │  ← v2: first 32KB, PVH: ELF sections
 │  - Tests validate linker integration │  ← Proper section placement
 └─────────────────────────────────────┘
-    ↓
+  ↓
 ┌─────────────────────────────────────┐
 │  Boot Protocol Detection (Tested First) │
 │  - Tests define magic number validation │  ← EAX register checks
@@ -480,7 +480,7 @@ TDD Boot Protocol Flow:
 │  - Tests define protocol selection logic │  ← Multiboot v2 vs PVH ELF
 │  - Tests validate debug marker output │  ← Boot progress indication
 └─────────────────────────────────────┘
-    ↓
+  ↓
 ┌─────────────────────────────────────┐
 │  Mode Transition (Tested First)     │
 │  - Tests define 32-bit entry handling │  ← PVH ELF and Multiboot v2 32-bit
@@ -527,11 +527,11 @@ The namespace filesystem appears designed with a unified request routing system 
 
 ```
 Application Request (open/read/write/close)
-    ↓
+  ↓
 VFS Request Router
-    ↓
+  ↓
 Path Analysis & Handler Lookup
-    ↓
+  ↓
 ┌─────────────────────┬─────────────────────┐
 │   Kernel Handler    │   Userland Handler  │
 │   (//kern/*, etc.)  │   (//scsi/*, etc.)  │
@@ -541,7 +541,7 @@ Path Analysis & Handler Lookup
 │   Kernel Subsystem  │   Userland Service  │
 │   Response          │   Response          │
 └─────────────────────┴─────────────────────┘
-    ↓
+  ↓
 Unified Response to Application
 ```
 
@@ -625,7 +625,7 @@ This design appears to enable userland tooling to parse statistics programmatica
 - Individual devices appear as `//scsi/hostN/H:C:T:L/` following SCSI addressing (Host:Channel:Target:LUN)
 - Each SCSI device provides comprehensive metadata from SCSI INQUIRY commands:
   - `model` - Device model string from SCSI INQUIRY
-  - `vendor` - Vendor identification from SCSI INQUIRY  
+  - `vendor` - Vendor identification from SCSI INQUIRY
   - `serial` - Unit serial number from SCSI INQUIRY
   - `wwn` - World Wide Name for devices that support it
   - `scsi_id` - Complete SCSI identifier string
@@ -692,50 +692,50 @@ This design appears to enable userland tooling to parse statistics programmatica
 
 ```c
 struct kobj_s {
-    enum kobj_type type;          // THREAD, PROCESS, PGROUP, SERVICE, etc.
-    atomic_t ref_count;           // Reference counting
-    struct spinlock_s *obj_lock;       // Object-level locking
-    struct kobj_pool *pool;       // Pool this object belongs to
-    uint32_t magic;               // Magic number for validation
-    struct list_head pool_list;   // List entry for pool management
+  enum kobj_type type;          // THREAD, PROCESS, PGROUP, SERVICE, etc.
+  atomic_t ref_count;           // Reference counting
+  struct spinlock_s *obj_lock;       // Object-level locking
+  struct kobj_pool *pool;       // Pool this object belongs to
+  uint32_t magic;               // Magic number for validation
+  struct list_head pool_list;   // List entry for pool management
 };
 typedef struct kobj_s kobj_t;
 
 struct thread_s {
-    kobj_t kobj;                  // Kernel object header
-    tid_t tid;                    // Thread ID
-    struct process_s *process;    // Parent process
-    struct thread_context *ctx;  // CPU context and registers
-    struct thread_state state;   // Running, blocked, etc.
-    int sched_policy;            // SCHED_NORMAL, SCHED_FIFO, SCHED_RR, etc.
-    int priority;                // Thread priority (0-99 for RT, nice for normal)
-    int nice_value;              // Nice value for SCHED_NORMAL threads
-    struct sched_deadline_params *dl_params; // Deadline scheduling parameters
-    uint64_t runtime;            // CPU time consumed
-    uint64_t deadline;           // Absolute deadline (for SCHED_DEADLINE)
-    uint64_t period;             // Period (for SCHED_DEADLINE)
+  kobj_t kobj;                  // Kernel object header
+  tid_t tid;                    // Thread ID
+  struct process_s *process;    // Parent process
+  struct thread_context *ctx;  // CPU context and registers
+  struct thread_state state;   // Running, blocked, etc.
+  int sched_policy;            // SCHED_NORMAL, SCHED_FIFO, SCHED_RR, etc.
+  int priority;                // Thread priority (0-99 for RT, nice for normal)
+  int nice_value;              // Nice value for SCHED_NORMAL threads
+  struct sched_deadline_params *dl_params; // Deadline scheduling parameters
+  uint64_t runtime;            // CPU time consumed
+  uint64_t deadline;           // Absolute deadline (for SCHED_DEADLINE)
+  uint64_t period;             // Period (for SCHED_DEADLINE)
 };
 typedef struct thread_s thread_t;
 
 struct process_s {
-    kobj_t kobj;                  // Kernel object header
-    pid_t pid;                    // Process ID
-    struct process_group_s *pgrp; // Parent process group
-    struct capability_set *caps;
-    struct namespace *ns;
-    struct memory_space *mm;
-    struct thread_list *threads; // List of threads in this process
-    struct service_registrations *services;
-    struct resource_limits *limits; // Resource limits for container support
+  kobj_t kobj;                  // Kernel object header
+  pid_t pid;                    // Process ID
+  struct process_group_s *pgrp; // Parent process group
+  struct capability_set *caps;
+  struct namespace *ns;
+  struct memory_space *mm;
+  struct thread_list *threads; // List of threads in this process
+  struct service_registrations *services;
+  struct resource_limits *limits; // Resource limits for container support
 };
 typedef struct process_s process_t;
 
 struct process_group_s {
-    kobj_t kobj;                  // Kernel object header
-    pgid_t pgid;                  // Process group ID
-    struct session_s *session;   // Parent session (if any)
-    struct process_list *processes; // List of processes in this group
-    struct capability_set *group_caps; // Group-level capabilities
+  kobj_t kobj;                  // Kernel object header
+  pgid_t pgid;                  // Process group ID
+  struct session_s *session;   // Parent session (if any)
+  struct process_list *processes; // List of processes in this group
+  struct capability_set *group_caps; // Group-level capabilities
 };
 typedef struct process_group_s process_group_t;
 ```
@@ -744,79 +744,79 @@ typedef struct process_group_s process_group_t;
 
 ```c
 struct process_btree_node_s {
-    kobj_t kobj;                  // Kernel object header
-    bool is_leaf;                 // True if this is a leaf node
-    int key_count;                // Number of keys in this node
-    pid_t keys[BTREE_ORDER - 1];  // Process IDs (keys)
-    union {
-        process_t *processes[BTREE_ORDER]; // Leaf: pointers to processes
-        struct process_btree_node_s *children[BTREE_ORDER]; // Internal: child nodes
-    };
-    struct process_btree_node_s *parent; // Parent node
-    struct process_btree_node_s *next;   // Next leaf (for range queries)
+  kobj_t kobj;                  // Kernel object header
+  bool is_leaf;                 // True if this is a leaf node
+  int key_count;                // Number of keys in this node
+  pid_t keys[BTREE_ORDER - 1];  // Process IDs (keys)
+  union {
+    process_t *processes[BTREE_ORDER]; // Leaf: pointers to processes
+    struct process_btree_node_s *children[BTREE_ORDER]; // Internal: child nodes
+  };
+  struct process_btree_node_s *parent; // Parent node
+  struct process_btree_node_s *next;   // Next leaf (for range queries)
 };
 typedef struct process_btree_node_s process_btree_node_t;
 
 struct process_btree_s {
-    process_btree_node_t *root;   // Root of the B+ tree
-    int height;                   // Height of the tree
-    size_t process_count;         // Total number of processes
-    struct spinlock_s *tree_lock;      // Protects tree structure
+  process_btree_node_t *root;   // Root of the B+ tree
+  int height;                   // Height of the tree
+  size_t process_count;         // Total number of processes
+  struct spinlock_s *tree_lock;      // Protects tree structure
 };
 typedef struct process_btree_s process_btree_t;
 ```
 
 ```c
 struct kobj_pool {
-    enum kobj_type type;          // Type of objects in this pool
-    size_t obj_size;              // Size of each object
-    size_t pool_size;             // Total number of objects in pool
-    size_t free_count;            // Number of free objects
-    struct list_head free_list;   // List of free objects
-    struct list_head active_list; // List of active objects
-    struct spinlock pool_lock;    // Protects pool operations
-    void *pool_memory;            // Pre-allocated memory for objects
-    struct slab_cache *slab;      // Slab allocator for this object type
+  enum kobj_type type;          // Type of objects in this pool
+  size_t obj_size;              // Size of each object
+  size_t pool_size;             // Total number of objects in pool
+  size_t free_count;            // Number of free objects
+  struct list_head free_list;   // List of free objects
+  struct list_head active_list; // List of active objects
+  struct spinlock pool_lock;    // Protects pool operations
+  void *pool_memory;            // Pre-allocated memory for objects
+  struct slab_cache *slab;      // Slab allocator for this object type
 };
 
 enum kobj_type {
-    KOBJ_THREAD = 1,
-    KOBJ_PROCESS = 2,
-    KOBJ_PGROUP = 3,
-    KOBJ_SERVICE = 4,
-    KOBJ_NAMESPACE = 5,
-    KOBJ_RDMA_MR = 6,
-    KOBJ_RDMA_QP = 7,
-    KOBJ_CHARSTREAM = 8,
-    KOBJ_SCSI_HOST = 9,
-    KOBJ_SCSI_DEVICE = 10,
-    KOBJ_PARTITION = 11
+  KOBJ_THREAD = 1,
+  KOBJ_PROCESS = 2,
+  KOBJ_PGROUP = 3,
+  KOBJ_SERVICE = 4,
+  KOBJ_NAMESPACE = 5,
+  KOBJ_RDMA_MR = 6,
+  KOBJ_RDMA_QP = 7,
+  KOBJ_CHARSTREAM = 8,
+  KOBJ_SCSI_HOST = 9,
+  KOBJ_SCSI_DEVICE = 10,
+  KOBJ_PARTITION = 11
 };
 ```
 
 ```c
 struct sched_deadline_params {
-    uint64_t runtime;             // Maximum runtime per period
-    uint64_t deadline;            // Relative deadline
-    uint64_t period;              // Period length
-    uint64_t flags;               // Scheduling flags
+  uint64_t runtime;             // Maximum runtime per period
+  uint64_t deadline;            // Relative deadline
+  uint64_t period;              // Period length
+  uint64_t flags;               // Scheduling flags
 };
 
 struct scheduler_stats {
-    uint64_t context_switches;    // Total context switches
-    uint64_t preemptions;         // Preemption count
-    uint64_t deadline_misses;     // Deadline scheduling misses
-    uint64_t rt_throttling;       // Real-time throttling events
-    struct per_cpu_stats *cpu_stats; // Per-CPU scheduling statistics
+  uint64_t context_switches;    // Total context switches
+  uint64_t preemptions;         // Preemption count
+  uint64_t deadline_misses;     // Deadline scheduling misses
+  uint64_t rt_throttling;       // Real-time throttling events
+  struct per_cpu_stats *cpu_stats; // Per-CPU scheduling statistics
 };
 
 enum sched_policy {
-    SCHED_NORMAL = 0,             // Standard time-sharing
-    SCHED_FIFO = 1,              // First-in, first-out real-time
-    SCHED_RR = 2,                // Round-robin real-time
-    SCHED_BATCH = 3,             // Batch processing
-    SCHED_IDLE = 5,              // Very low priority
-    SCHED_DEADLINE = 6           // Deadline scheduling
+  SCHED_NORMAL = 0,             // Standard time-sharing
+  SCHED_FIFO = 1,              // First-in, first-out real-time
+  SCHED_RR = 2,                // Round-robin real-time
+  SCHED_BATCH = 3,             // Batch processing
+  SCHED_IDLE = 5,              // Very low priority
+  SCHED_DEADLINE = 6           // Deadline scheduling
 };
 ```
 
@@ -824,102 +824,102 @@ enum sched_policy {
 
 ```c
 struct scsi_host_s {
-    kobj_t kobj;                  // Kernel object header
-    uint32_t host_no;             // SCSI host number
-    char *host_name;              // Host adapter name
-    struct scsi_host_template *hostt; // Host template operations
-    struct capability_set *caps;  // Host capabilities
-    struct device_list *devices;  // List of SCSI devices on this host
-    struct spinlock_s *host_lock;      // Protects host state
-    atomic_t ref_count;           // Reference counting
+  kobj_t kobj;                  // Kernel object header
+  uint32_t host_no;             // SCSI host number
+  char *host_name;              // Host adapter name
+  struct scsi_host_template *hostt; // Host template operations
+  struct capability_set *caps;  // Host capabilities
+  struct device_list *devices;  // List of SCSI devices on this host
+  struct spinlock_s *host_lock;      // Protects host state
+  atomic_t ref_count;           // Reference counting
 };
 typedef struct scsi_host_s scsi_host_t;
 
 struct scsi_device_s {
-    kobj_t kobj;                  // Kernel object header
-    scsi_host_t *host;            // Parent SCSI host
-    uint32_t channel;             // SCSI channel number
-    uint32_t id;                  // SCSI target ID
-    uint32_t lun;                 // SCSI logical unit number
-    char scsi_address[16];        // "H:C:T:L" address string
-    
-    // SCSI INQUIRY data
-    char vendor[9];               // Vendor identification (8 chars + null)
-    char model[17];               // Product identification (16 chars + null)
-    char revision[5];             // Product revision (4 chars + null)
-    char serial[256];             // Unit serial number (variable length)
-    uint64_t wwn;                 // World Wide Name (if available)
-    
-    // Device characteristics
-    enum scsi_device_type type;   // Direct access, sequential, etc.
-    uint32_t sector_size;         // Logical block size
-    uint64_t capacity;            // Device capacity in blocks
-    bool removable;               // Removable media device
-    bool write_protected;         // Write protection status
-    
-    // Translation layer info (for ATA/NVMe devices)
-    enum device_protocol protocol; // SCSI_NATIVE, SCSI_ATA_SAT, SCSI_NVME_TRANS
-    void *protocol_data;          // Protocol-specific data
-    
-    struct partition_table *partitions; // Partition information
-    struct capability_set *access_caps;  // Access control capabilities
-    struct spinlock_s *device_lock;    // Protects device state
-    atomic_t ref_count;           // Reference counting
+  kobj_t kobj;                  // Kernel object header
+  scsi_host_t *host;            // Parent SCSI host
+  uint32_t channel;             // SCSI channel number
+  uint32_t id;                  // SCSI target ID
+  uint32_t lun;                 // SCSI logical unit number
+  char scsi_address[16];        // "H:C:T:L" address string
+
+  // SCSI INQUIRY data
+  char vendor[9];               // Vendor identification (8 chars + null)
+  char model[17];               // Product identification (16 chars + null)
+  char revision[5];             // Product revision (4 chars + null)
+  char serial[256];             // Unit serial number (variable length)
+  uint64_t wwn;                 // World Wide Name (if available)
+
+  // Device characteristics
+  enum scsi_device_type type;   // Direct access, sequential, etc.
+  uint32_t sector_size;         // Logical block size
+  uint64_t capacity;            // Device capacity in blocks
+  bool removable;               // Removable media device
+  bool write_protected;         // Write protection status
+
+  // Translation layer info (for ATA/NVMe devices)
+  enum device_protocol protocol; // SCSI_NATIVE, SCSI_ATA_SAT, SCSI_NVME_TRANS
+  void *protocol_data;          // Protocol-specific data
+
+  struct partition_table *partitions; // Partition information
+  struct capability_set *access_caps;  // Access control capabilities
+  struct spinlock_s *device_lock;    // Protects device state
+  atomic_t ref_count;           // Reference counting
 };
 typedef struct scsi_device_s scsi_device_t;
 
 enum scsi_device_type {
-    SCSI_TYPE_DISK = 0x00,        // Direct-access block device
-    SCSI_TYPE_TAPE = 0x01,        // Sequential-access device
-    SCSI_TYPE_PRINTER = 0x02,     // Printer device
-    SCSI_TYPE_PROCESSOR = 0x03,   // Processor device
-    SCSI_TYPE_WORM = 0x04,        // Write-once read-multiple device
-    SCSI_TYPE_ROM = 0x05,         // CD-ROM device
-    SCSI_TYPE_SCANNER = 0x06,     // Scanner device
-    SCSI_TYPE_MOD = 0x07,         // Optical memory device
-    SCSI_TYPE_MEDIUM_CHANGER = 0x08, // Medium changer device
-    SCSI_TYPE_COMM = 0x09,        // Communications device
-    SCSI_TYPE_ENCLOSURE = 0x0d,   // Enclosure services device
-    SCSI_TYPE_RBC = 0x0e,         // Simplified direct-access device
-    SCSI_TYPE_OSD = 0x11,         // Object-based storage device
-    SCSI_TYPE_NO_LUN = 0x7f       // Unknown or no device type
+  SCSI_TYPE_DISK = 0x00,        // Direct-access block device
+  SCSI_TYPE_TAPE = 0x01,        // Sequential-access device
+  SCSI_TYPE_PRINTER = 0x02,     // Printer device
+  SCSI_TYPE_PROCESSOR = 0x03,   // Processor device
+  SCSI_TYPE_WORM = 0x04,        // Write-once read-multiple device
+  SCSI_TYPE_ROM = 0x05,         // CD-ROM device
+  SCSI_TYPE_SCANNER = 0x06,     // Scanner device
+  SCSI_TYPE_MOD = 0x07,         // Optical memory device
+  SCSI_TYPE_MEDIUM_CHANGER = 0x08, // Medium changer device
+  SCSI_TYPE_COMM = 0x09,        // Communications device
+  SCSI_TYPE_ENCLOSURE = 0x0d,   // Enclosure services device
+  SCSI_TYPE_RBC = 0x0e,         // Simplified direct-access device
+  SCSI_TYPE_OSD = 0x11,         // Object-based storage device
+  SCSI_TYPE_NO_LUN = 0x7f       // Unknown or no device type
 };
 
 enum device_protocol {
-    SCSI_NATIVE,                  // Native SCSI device
-    SCSI_ATA_SAT,                 // ATA device via SCSI-ATA Translation
-    SCSI_NVME_TRANS               // NVMe device via SCSI translation
+  SCSI_NATIVE,                  // Native SCSI device
+  SCSI_ATA_SAT,                 // ATA device via SCSI-ATA Translation
+  SCSI_NVME_TRANS               // NVMe device via SCSI translation
 };
 
 struct partition_entry_s {
-    kobj_t kobj;                  // Kernel object header
-    uint32_t partition_number;    // Partition number (1-based)
-    uint64_t start_sector;        // Starting sector
-    uint64_t sector_count;        // Number of sectors
-    uint8_t partition_type;       // Partition type code
-    char *filesystem_type;        // Detected filesystem type
-    bool bootable;                // Bootable flag
-    struct capability_set *access_caps; // Partition access control
-    struct spinlock_s *partition_lock; // Protects partition state
-    atomic_t ref_count;           // Reference counting
+  kobj_t kobj;                  // Kernel object header
+  uint32_t partition_number;    // Partition number (1-based)
+  uint64_t start_sector;        // Starting sector
+  uint64_t sector_count;        // Number of sectors
+  uint8_t partition_type;       // Partition type code
+  char *filesystem_type;        // Detected filesystem type
+  bool bootable;                // Bootable flag
+  struct capability_set *access_caps; // Partition access control
+  struct spinlock_s *partition_lock; // Protects partition state
+  atomic_t ref_count;           // Reference counting
 };
 typedef struct partition_entry_s partition_entry_t;
 
 struct partition_table_s {
-    enum partition_table_type type; // MBR, GPT, etc.
-    uint32_t partition_count;     // Number of partitions
-    partition_entry_t **partitions; // Array of partition entries
-    struct spinlock_s *table_lock;     // Protects partition table
-    atomic_t ref_count;           // Reference counting
+  enum partition_table_type type; // MBR, GPT, etc.
+  uint32_t partition_count;     // Number of partitions
+  partition_entry_t **partitions; // Array of partition entries
+  struct spinlock_s *table_lock;     // Protects partition table
+  atomic_t ref_count;           // Reference counting
 };
 typedef struct partition_table_s partition_table_t;
 
 enum partition_table_type {
-    PARTITION_TABLE_MBR,          // Master Boot Record
-    PARTITION_TABLE_GPT,          // GUID Partition Table
-    PARTITION_TABLE_BSD,          // BSD disklabel
-    PARTITION_TABLE_SUN,          // Sun disklabel
-    PARTITION_TABLE_NONE          // No partition table
+  PARTITION_TABLE_MBR,          // Master Boot Record
+  PARTITION_TABLE_GPT,          // GUID Partition Table
+  PARTITION_TABLE_BSD,          // BSD disklabel
+  PARTITION_TABLE_SUN,          // Sun disklabel
+  PARTITION_TABLE_NONE          // No partition table
 };
 ```
 
@@ -927,14 +927,14 @@ enum partition_table_type {
 
 ```c
 struct service_entry_s {
-    kobj_t kobj;                  // Kernel object header
-    char *path;                   // e.g., "//scsi/host0/0:0:0:0"
-    struct capability_set *caps;  // Service capabilities
-    struct file_operations *ops;  // Filesystem operations
-    struct metadata *meta;        // Service metadata
-    struct dependency_list *deps; // Service dependencies
-    struct spinlock_s *service_lock;   // Protects service entry
-    atomic_t ref_count;           // Reference counting for safe cleanup
+  kobj_t kobj;                  // Kernel object header
+  char *path;                   // e.g., "//scsi/host0/0:0:0:0"
+  struct capability_set *caps;  // Service capabilities
+  struct file_operations *ops;  // Filesystem operations
+  struct metadata *meta;        // Service metadata
+  struct dependency_list *deps; // Service dependencies
+  struct spinlock_s *service_lock;   // Protects service entry
+  atomic_t ref_count;           // Reference counting for safe cleanup
 };
 typedef struct service_entry_s service_entry_t;
 ```
@@ -943,79 +943,79 @@ typedef struct service_entry_s service_entry_t;
 
 ```c
 struct rdma_memory_region_s {
-    void *virtual_addr;           // Virtual address of memory region
-    uint64_t physical_addr;       // Physical address for DMA
-    size_t length;                // Size of memory region
-    uint32_t lkey;                // Local key for access
-    uint32_t rkey;                // Remote key for RDMA operations
-    struct capability_set *access_caps; // Access control capabilities
-    struct spinlock_s *region_lock;    // Protects memory region
-    atomic_t ref_count;           // Reference counting
+  void *virtual_addr;           // Virtual address of memory region
+  uint64_t physical_addr;       // Physical address for DMA
+  size_t length;                // Size of memory region
+  uint32_t lkey;                // Local key for access
+  uint32_t rkey;                // Remote key for RDMA operations
+  struct capability_set *access_caps; // Access control capabilities
+  struct spinlock_s *region_lock;    // Protects memory region
+  atomic_t ref_count;           // Reference counting
 };
 typedef struct rdma_memory_region_s rdma_memory_region_t;
 
 struct rdma_queue_pair_s {
-    uint32_t qp_num;              // Queue pair number
-    enum qp_type type;            // RC, UC, UD queue pair types
-    struct rdma_device *device;  // Associated RDMA device
-    struct work_queue *send_wq;   // Send work queue
-    struct work_queue *recv_wq;   // Receive work queue
-    struct completion_queue *send_cq; // Send completion queue
-    struct completion_queue *recv_cq; // Receive completion queue
-    struct spinlock_s *qp_lock;        // Protects queue pair state
-    atomic_t ref_count;           // Reference counting
+  uint32_t qp_num;              // Queue pair number
+  enum qp_type type;            // RC, UC, UD queue pair types
+  struct rdma_device *device;  // Associated RDMA device
+  struct work_queue *send_wq;   // Send work queue
+  struct work_queue *recv_wq;   // Receive work queue
+  struct completion_queue *send_cq; // Send completion queue
+  struct completion_queue *recv_cq; // Receive completion queue
+  struct spinlock_s *qp_lock;        // Protects queue pair state
+  atomic_t ref_count;           // Reference counting
 };
 typedef struct rdma_queue_pair_s rdma_queue_pair_t;
 ```
 
 ```c
 struct rdma_memory_region {
-    void *virtual_addr;            // Virtual address of memory region
-    uint64_t physical_addr;        // Physical address for DMA
-    size_t length;                 // Size of memory region
-    uint32_t lkey;                 // Local key for access
-    uint32_t rkey;                 // Remote key for RDMA operations
-    struct capability_set *access_caps; // Access control capabilities
-    struct spinlock_s *region_lock;     // Protects memory region
-    atomic_t ref_count;           // Reference counting
+  void *virtual_addr;            // Virtual address of memory region
+  uint64_t physical_addr;        // Physical address for DMA
+  size_t length;                 // Size of memory region
+  uint32_t lkey;                 // Local key for access
+  uint32_t rkey;                 // Remote key for RDMA operations
+  struct capability_set *access_caps; // Access control capabilities
+  struct spinlock_s *region_lock;     // Protects memory region
+  atomic_t ref_count;           // Reference counting
 };
 
 struct rdma_queue_pair {
-    uint32_t qp_num;              // Queue pair number
-    enum qp_type type;            // RC, UC, UD queue pair types
-    struct rdma_device *device;   // Associated RDMA device
-    struct work_queue *send_wq;   // Send work queue
-    struct work_queue *recv_wq;   // Receive work queue
-    struct completion_queue *send_cq; // Send completion queue
-    struct completion_queue *recv_cq; // Receive completion queue
-    struct spinlock_s *qp_lock;        // Protects queue pair state
-    atomic_t ref_count;           // Reference counting
+  uint32_t qp_num;              // Queue pair number
+  enum qp_type type;            // RC, UC, UD queue pair types
+  struct rdma_device *device;   // Associated RDMA device
+  struct work_queue *send_wq;   // Send work queue
+  struct work_queue *recv_wq;   // Receive work queue
+  struct completion_queue *send_cq; // Send completion queue
+  struct completion_queue *recv_cq; // Receive completion queue
+  struct spinlock_s *qp_lock;        // Protects queue pair state
+  atomic_t ref_count;           // Reference counting
 };
 ```
 
 ```c
 struct namespace_entry_s {
-    char *name;
-    enum entry_type type;          // FILE, DIRECTORY, SERVICE, SYMLINK, CHARSTREAM
-    service_entry_t *service;      // If type == SERVICE
-    char *symlink_target;          // If type == SYMLINK
-    struct char_stream_s *stream;  // If type == CHARSTREAM
-    struct capability_set *access_caps;
-    struct notification_list *waiters;
-    struct spinlock_s *entry_lock;      // Protects namespace entry
-    atomic_t ref_count;           // Reference counting
+  char *name;
+  enum entry_type type;          // FILE, DIRECTORY, SERVICE, SYMLINK, CHARSTREAM
+  service_entry_t *service;      // If type == SERVICE
+  char *symlink_target;          // If type == SYMLINK
+  struct char_stream_s *stream;  // If type == CHARSTREAM
+  struct capability_set *access_caps;
+  struct notification_list *waiters;
+  struct spinlock_s *entry_lock;      // Protects namespace entry
+  atomic_t ref_count;           // Reference counting
 };
 typedef struct namespace_entry_s namespace_entry_t;
 
 struct char_stream_s {
-    struct stream_operations *ops; // Stream-specific operations (read, write, ioctl)
-    struct buffer_queue *input_queue;  // Input buffer for character streams
-    struct buffer_queue *output_queue; // Output buffer for character streams
-    struct wait_queue *readers;    // Processes waiting to read
-    struct wait_queue *writers;    // Processes waiting to write
-    struct termios *tty_settings;  // Terminal settings (if applicable)
-    struct spinlock_s *stream_lock;     // Protects stream state
-    atomic_t ref_count;           // Reference counting
+  struct stream_operations *ops; // Stream-specific operations (read, write, ioctl)
+  struct buffer_queue *input_queue;  // Input buffer for character streams
+  struct buffer_queue *output_queue; // Output buffer for character streams
+  struct wait_queue *readers;    // Processes waiting to read
+  struct wait_queue *writers;    // Processes waiting to write
+  struct termios *tty_settings;  // Terminal settings (if applicable)
+  struct spinlock_s *stream_lock;     // Protects stream state
+  atomic_t ref_count;           // Reference counting
 };
 typedef struct char_stream_s char_stream_t;
 ```
@@ -1024,29 +1024,29 @@ typedef struct char_stream_s char_stream_t;
 
 ```c
 struct fast_ipc_region_s {
-    kobj_t kobj;                  // Kernel object header
-    void *userland_addr;          // Mapped address in userland
-    void *kernel_addr;            // Kernel address of shared region
-    size_t region_size;           // Size of mapped region
-    struct capability_set *access_caps; // Access control
-    struct fast_ipc_ops *ops;     // Fast IPC operations
+  kobj_t kobj;                  // Kernel object header
+  void *userland_addr;          // Mapped address in userland
+  void *kernel_addr;            // Kernel address of shared region
+  size_t region_size;           // Size of mapped region
+  struct capability_set *access_caps; // Access control
+  struct fast_ipc_ops *ops;     // Fast IPC operations
 };
 typedef struct fast_ipc_region_s fast_ipc_region_t;
 
 struct fast_ipc_ops_s {
-    int (*fast_send)(void *msg, size_t len, pid_t target);
-    int (*fast_recv)(void *buf, size_t len, pid_t *sender);
-    int (*fast_notify)(pid_t target, uint32_t event);
-    int (*fast_wait)(uint32_t *events, int timeout);
+  int (*fast_send)(void *msg, size_t len, pid_t target);
+  int (*fast_recv)(void *buf, size_t len, pid_t *sender);
+  int (*fast_notify)(pid_t target, uint32_t event);
+  int (*fast_wait)(uint32_t *events, int timeout);
 };
 typedef struct fast_ipc_ops_s fast_ipc_ops_t;
 
 // Fast userland mutex operations (similar to Linux futex)
 struct fast_mutex_s {
-    atomic_t value;               // Mutex state (0=unlocked, 1=locked)
-    struct wait_queue *waiters;   // Queue of waiting threads
-    pid_t owner;                  // Current owner process
-    uint32_t flags;               // Mutex flags and options
+  atomic_t value;               // Mutex state (0=unlocked, 1=locked)
+  struct wait_queue *waiters;   // Queue of waiting threads
+  pid_t owner;                  // Current owner process
+  uint32_t flags;               // Mutex flags and options
 };
 typedef struct fast_mutex_s fast_mutex_t;
 ```
@@ -1266,29 +1266,29 @@ FMI/OS employs a multi-layered Test-Driven Development approach with both unit t
 **Key TDD Testing Areas:**
 
 1. **Namespace Operations TDD:**
-   - Tests written first for all filesystem operations on `//` namespace
-   - Implementation follows to satisfy standard filesystem semantics
-   - Validates concurrent access patterns and race conditions
+  - Tests written first for all filesystem operations on `//` namespace
+  - Implementation follows to satisfy standard filesystem semantics
+  - Validates concurrent access patterns and race conditions
 
 2. **Service Registration TDD:**
-   - Tests written first for service registration and discovery scenarios
-   - Implementation follows to satisfy hierarchical namespace requirements
-   - Validates service discovery and dependency resolution
+  - Tests written first for service registration and discovery scenarios
+  - Implementation follows to satisfy hierarchical namespace requirements
+  - Validates service discovery and dependency resolution
 
 3. **IPC TDD:**
-   - Tests written first for all IPC communication patterns
-   - Implementation follows to satisfy filesystem-based IPC requirements
-   - Validates data integrity across process boundaries and security enforcement
+  - Tests written first for all IPC communication patterns
+  - Implementation follows to satisfy filesystem-based IPC requirements
+  - Validates data integrity across process boundaries and security enforcement
 
 4. **Container TDD:**
-   - Tests written first for all container configurations and operations
-   - Implementation follows to satisfy OCI compliance requirements
-   - Validates namespace isolation and capability restrictions
+  - Tests written first for all container configurations and operations
+  - Implementation follows to satisfy OCI compliance requirements
+  - Validates namespace isolation and capability restrictions
 
 5. **Memory Management TDD:**
-   - Tests written first for all memory allocation patterns and scenarios
-   - Implementation follows to satisfy memory protection and isolation requirements
-   - Validates page mapping operations for correctness and performance
+  - Tests written first for all memory allocation patterns and scenarios
+  - Implementation follows to satisfy memory protection and isolation requirements
+  - Validates page mapping operations for correctness and performance
 
 ### Integration Testing
 

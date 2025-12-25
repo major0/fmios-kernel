@@ -17,7 +17,7 @@ graph TB
         AM[Makefile.am]
         AC --> AM
     end
-    
+
     subgraph "Architecture Management"
         AS[Architecture Selection]
         SL[Symlink Management]
@@ -25,34 +25,34 @@ graph TB
         AS --> SL
         AS --> CF
     end
-    
+
     subgraph "Code Organization"
         GC[Generic Code<br/>include/, lib/, kernel/]
         ASC[Arch-Specific Code<br/>arch/*/]
         TC[Test Code<br/>tests/]
     end
-    
+
     subgraph "Build Targets"
         KB[Kernel Build<br/>Freestanding]
         TB[Test Build<br/>Hosted]
         QB[QEMU Testing]
     end
-    
+
     subgraph "Quality Enforcement"
         FD[Forward Declaration Check]
         AV[Architecture Validation]
         IC[Interface Compliance]
     end
-    
+
     AC --> AS
     AM --> KB
     AM --> TB
     AM --> QB
-    
+
     GC --> KB
     ASC --> KB
     TC --> TB
-    
+
     KB --> FD
     TB --> FD
     KB --> AV
@@ -161,7 +161,7 @@ TEST_CFLAGS += -O0 -g -Wall -Wextra -Werror
 # x86_64 specific
 x86_64_CFLAGS = -mcmodel=kernel -mno-red-zone -mno-mmx -mno-sse
 
-# ARM64 specific  
+# ARM64 specific
 aarch64_CFLAGS = -mcpu=cortex-a57 -mgeneral-regs-only
 
 # RISC-V specific
@@ -372,7 +372,7 @@ Each property test should run a minimum of 100 iterations to ensure comprehensiv
 
 **Test Framework**: Custom build system testing framework integrated with Unity
 **Iteration Count**: 100 minimum per property test
-**Input Generation**: 
+**Input Generation**:
 - Random target architecture selection from supported set
 - Random feature flag combinations within compatibility constraints
 - Random source file selection for code quality testing

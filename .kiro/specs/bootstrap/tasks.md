@@ -4,10 +4,10 @@
 
 This implementation plan follows the incremental development approach, building bootstrap functionality stage by stage. Each stage produces a working, testable kernel that boots and demonstrates implemented features.
 
-**INCREMENTAL APPROACH**: 
+**INCREMENTAL APPROACH**:
 - Stage 1: Minimal x86_64 PVH ELF bootstrap (Hello World)
 - Stage 2: Add Multiboot2 support to x86_64
-- Stage 3: Add UEFI support to x86_64  
+- Stage 3: Add UEFI support to x86_64
 - Stage 5: ARM64 bootstrap (U-Boot + UEFI)
 - Stage 6: RISC-V bootstrap (U-Boot + UEFI)
 
@@ -62,7 +62,7 @@ Simplify the existing kernel to create a minimal bootstrap validation environmen
 
 **Phase 2: Implement Boot-Mode Specific Main Functions**
 - Create mb2_main() for Multiboot v2 specific initialization
-- Create pvh_main() for PVH ELF specific initialization  
+- Create pvh_main() for PVH ELF specific initialization
 - Create uefi_main() for UEFI specific initialization
 - Create uboot_main() for U-Boot specific initialization
 - Each boot-mode main handles protocol-specific setup before calling kmain()
@@ -105,7 +105,7 @@ Implement simplified x86_64 bootstrap code that assumes 32-bit mode entry for al
 
 **Phase 2: Boot-Mode Specific Jump Targets**
 - Multiboot v2 entry: 32-bit mode → 64-bit transition → mb2_main(magic, info)
-- PVH ELF entry: 32-bit mode → 64-bit transition → pvh_main(start_info)  
+- PVH ELF entry: 32-bit mode → 64-bit transition → pvh_main(start_info)
 - UEFI entry: 64-bit mode → uefi_main(system_table)
 - Each jump target receives boot-protocol specific parameters
 - Clean separation between assembly bootstrap and C initialization code

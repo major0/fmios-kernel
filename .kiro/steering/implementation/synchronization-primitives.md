@@ -37,7 +37,7 @@ The kernel synchronization primitives are designed as **simple, atomic-based loc
 - Suitable for short critical sections
 - No thread ownership tracking
 
-### Mutexes (`mutex_t`) 
+### Mutexes (`mutex_t`)
 - **NOT IMPLEMENTED** at this level
 - Requires thread management infrastructure for proper blocking behavior
 - Should provide owner tracking and priority inheritance
@@ -55,7 +55,7 @@ The kernel synchronization primitives are designed as **simple, atomic-based loc
 - Placeholder functions that do nothing
 
 ### Wait Queues (`wait_queue_t`)
-- **NOT IMPLEMENTED** at this level  
+- **NOT IMPLEMENTED** at this level
 - Requires thread management infrastructure
 - Placeholder functions that do nothing
 
@@ -116,16 +116,16 @@ The following practices are STRICTLY FORBIDDEN:
 ```c
 // FORBIDDEN: Custom spinlock implementation
 struct my_spinlock {
-    volatile int locked;
+  volatile int locked;
 };
 
 void my_spin_lock(struct my_spinlock *lock) {
-    // Custom implementation - NEVER DO THIS
+  // Custom implementation - NEVER DO THIS
 }
 
 // FORBIDDEN: Custom atomic operations
 static inline int my_atomic_compare_exchange(volatile int *ptr, int expected, int desired) {
-    // Custom implementation - NEVER DO THIS
+  // Custom implementation - NEVER DO THIS
 }
 ```
 
@@ -133,7 +133,7 @@ static inline int my_atomic_compare_exchange(volatile int *ptr, int expected, in
 ```c
 // FORBIDDEN: Reimplementing existing sync functions
 void my_custom_spinlock_init(struct my_spinlock *lock) {
-    // Duplicates spinlock_init() - NEVER DO THIS
+  // Duplicates spinlock_init() - NEVER DO THIS
 }
 ```
 
@@ -148,7 +148,7 @@ struct spinlock pool_lock;
 spinlock_init(&pool_lock);
 
 // lib/lists.c MUST use lib/spinlock.c
-#include "sync.h"  
+#include "sync.h"
 struct spinlock list_lock;
 spinlock_init(&list_lock);
 
@@ -180,9 +180,9 @@ spinlock_init(&subsystem_lock);
 As the kernel develops, these low-level primitives will serve as the foundation for:
 
 1. **Thread-Aware Synchronization**: Mutexes and semaphores implemented in the threading framework
-   - Proper blocking behavior instead of busy-waiting
-   - Owner tracking and priority inheritance for mutexes
-   - Resource counting with thread queuing for semaphores
+  - Proper blocking behavior instead of busy-waiting
+  - Owner tracking and priority inheritance for mutexes
+  - Resource counting with thread queuing for semaphores
 2. **POSIX Compliance**: Full POSIX synchronization API implementation
 3. **Debugging Support**: Lock tracking, deadlock detection, performance monitoring
 

@@ -25,38 +25,38 @@ FMI/OS uses an autoconf/automake-based build system with support for cross-compi
 ### Build Instructions
 
 1. **Configure the build system:**
-   ```bash
-   # For x86_64 target
-   ./configure --target=x86_64-fmios
-   
-   # For ARM64 target
-   ./configure --target=aarch64-fmios
-   
-   # For RISC-V target
-   ./configure --target=riscv64-fmios
-   ```
+  ```bash
+  # For x86_64 target
+  ./configure --target=x86_64-fmios
+
+  # For ARM64 target
+  ./configure --target=aarch64-fmios
+
+  # For RISC-V target
+  ./configure --target=riscv64-fmios
+  ```
 
 2. **Build the kernel:**
-   ```bash
-   make
-   ```
+  ```bash
+  make
+  ```
 
 3. **Run tests:**
-   ```bash
-   make check
-   ```
+  ```bash
+  make check
+  ```
 
 4. **Test in QEMU:**
-   ```bash
-   # x86_64 testing
-   make qemu-test-x86_64
-   
-   # ARM64 testing  
-   make qemu-test-aarch64
-   
-   # RISC-V testing
-   make qemu-test-riscv64
-   ```
+  ```bash
+  # x86_64 testing
+  make qemu-test-x86_64
+
+  # ARM64 testing
+  make qemu-test-aarch64
+
+  # RISC-V testing
+  make qemu-test-riscv64
+  ```
 
 ### Build Configuration Options
 
@@ -86,9 +86,9 @@ FMI/OS uses a spec-driven development process with Git workflow integration.
 ### Development Workflow
 
 1. **Setup Git Hooks**: Install pre-commit hooks for automated validation
-   ```bash
-   ./scripts/setup-git-hooks.sh
-   ```
+  ```bash
+  ./scripts/setup-git-hooks.sh
+  ```
 
 2. **Spec-Driven Development**: All features start with requirements and design specifications
 3. **Topic Branches**: Each task gets its own branch following `{spec-name}/{task-number}-{brief-description}` format
@@ -98,21 +98,21 @@ FMI/OS uses a spec-driven development process with Git workflow integration.
 ### Git Workflow
 
 1. **Create a topic branch:**
-   ```bash
-   ./scripts/create-topic-branch.sh <spec-name> <task-number> <description>
-   ```
+  ```bash
+  ./scripts/create-topic-branch.sh <spec-name> <task-number> <description>
+  ```
 
 2. **Make changes with conventional commits:**
-   ```bash
-   git commit -m "feat(memory): implement slab allocator core functionality
+  ```bash
+  git commit -m "feat(memory): implement slab allocator core functionality
 
-   Task: memory#2.1"
-   ```
+  Task: memory#2.1"
+  ```
 
 3. **Prepare for merge:**
-   ```bash
-   ./scripts/prepare-merge.sh
-   ```
+  ```bash
+  ./scripts/prepare-merge.sh
+  ```
 
 4. **Create pull request** with proper task references and acceptance criteria
 
@@ -190,7 +190,7 @@ fmios/
 
 ## License
 
-This project is licensed under the GNU General Public License v2.0 - see [LICENSE.md](LICENSE.md) for details.
+This project is licensed under the GNU General Public License v2.0 - see [LICENSE.txt](LICENSE.txt) for details.
 
 ## Support
 

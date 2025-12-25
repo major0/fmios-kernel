@@ -14,7 +14,7 @@ This document summarizes the comprehensive restructuring of all FMI/OS specs to 
 ### 2. Bootstrap Subsystem
 - **File**: `.kiro/specs/bootstrap/tasks.md`
 - **Status**: ✅ COMPLETED
-- **Changes**: 
+- **Changes**:
   - Restructured tasks to follow incremental stages
   - Stage 1: PVH ELF x86_64 only
   - Stage 2: Add Multiboot2 to x86_64

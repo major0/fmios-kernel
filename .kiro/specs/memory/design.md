@@ -10,7 +10,7 @@ The Memory Management subsystem provides comprehensive memory allocation, protec
 
 ```
 Kernel Code → kmalloc()/kfree() → Slab Allocator → Page Allocator → Physical Memory
-     ↓              ↓                    ↓               ↓              ↓
+    ↓              ↓                    ↓               ↓              ↓
   Memory Requests  Size Classes      Page Allocation  Arch-Specific   Hardware RAM
   VMA Management   Bitmap Tracking   3-Level Tables   Memory Detection
 ```
@@ -43,21 +43,21 @@ void *_kcalloc(size_t nmemb, size_t size);
 
 // Slab cache management
 struct slab_cache_s {
-    size_t obj_size;
-    size_t objects_per_slab;
-    list_t available_slabs;
-    list_t full_slabs;
-    spinlock_t cache_lock;
-    uint64_t alloc_count;
-    uint64_t free_count;
-    uint32_t *free_bitmap;
+  size_t obj_size;
+  size_t objects_per_slab;
+  list_t available_slabs;
+  list_t full_slabs;
+  spinlock_t cache_lock;
+  uint64_t alloc_count;
+  uint64_t free_count;
+  uint32_t *free_bitmap;
 } slab_cache_t;
 
 // Size class management
 enum size_class {
-    SIZE_16 = 0, SIZE_32, SIZE_64, SIZE_128,
-    SIZE_256, SIZE_512, SIZE_1024, SIZE_2048, SIZE_4096,
-    MAX_SIZE_CLASSES
+  SIZE_16 = 0, SIZE_32, SIZE_64, SIZE_128,
+  SIZE_256, SIZE_512, SIZE_1024, SIZE_2048, SIZE_4096,
+  MAX_SIZE_CLASSES
 };
 ```
 
@@ -71,27 +71,27 @@ int pages_mark_invalid(void *addr, size_t page_count);
 
 // Page state management
 enum page_state {
-    PAGE_FREE = 0,
-    PAGE_ALLOCATED = 1,
-    PAGE_INVALID = 2,
-    PAGE_RESERVED = 3
+  PAGE_FREE = 0,
+  PAGE_ALLOCATED = 1,
+  PAGE_INVALID = 2,
+  PAGE_RESERVED = 3
 };
 
 // 3-level page table structure
 struct page_table_l1_s {
-    struct page_table_l2_s *l2_tables[1024];  // 1GB regions
-    spinlock_t l1_lock;
+  struct page_table_l2_s *l2_tables[1024];  // 1GB regions
+  spinlock_t l1_lock;
 } page_table_l1_t;
 
 struct page_table_l2_s {
-    struct page_table_l3_s *l3_tables[64];    // 16MB regions
-    spinlock_t l2_lock;
+  struct page_table_l3_s *l3_tables[64];    // 16MB regions
+  spinlock_t l2_lock;
 } page_table_l2_t;
 
 struct page_table_l3_s {
-    uint32_t page_bitmap[2048];                // 256KB regions, 2-bit per page
-    spinlock_t l3_lock;
-    uint32_t free_count;
+  uint32_t page_bitmap[2048];                // 256KB regions, 2-bit per page
+  spinlock_t l3_lock;
+  uint32_t free_count;
 } page_table_l3_t;
 ```
 
@@ -100,21 +100,21 @@ struct page_table_l3_s {
 ```c
 // Virtual Memory Area management
 struct vma_s {
-    uint64_t start_addr;
-    uint64_t end_addr;
-    uint32_t permissions;
-    uint32_t flags;
-    struct list_head vma_list;
-    kobj_t vma_kobj;
+  uint64_t start_addr;
+  uint64_t end_addr;
+  uint32_t permissions;
+  uint32_t flags;
+  struct list_head vma_list;
+  kobj_t vma_kobj;
 } vma_t;
 
 // Memory space per process
 struct memory_space_s {
-    list_t vma_list;
-    spinlock_t space_lock;
-    uint64_t total_size;
-    uint64_t used_size;
-    kobj_t space_kobj;
+  list_t vma_list;
+  spinlock_t space_lock;
+  uint64_t total_size;
+  uint64_t used_size;
+  kobj_t space_kobj;
 } memory_space_t;
 
 // Memory management functions
@@ -129,36 +129,36 @@ int memory_protect_region(memory_space_t *space, uint64_t addr, size_t size, uin
 
 ```c
 struct memory_stats_s {
-    // Physical memory statistics
-    struct {
-        uint64_t total;
-        uint64_t free;
-        uint64_t used;
-        uint64_t cached;
-    } physical;
-    
-    // Virtual memory statistics
-    struct {
-        uint64_t total;
-        uint64_t allocated;
-        uint64_t reserved;
-    } virtual;
-    
-    // System statistics
-    struct {
-        uint64_t allocations;
-        uint64_t faults;
-        uint64_t swapping;
-    } system;
-    
-    // Pool statistics
-    struct {
-        uint32_t pool_count;
-        uint32_t utilization;
-        uint32_t fragmentation;
-    } pools;
-    
-    spinlock_t stats_lock;
+  // Physical memory statistics
+  struct {
+    uint64_t total;
+    uint64_t free;
+    uint64_t used;
+    uint64_t cached;
+  } physical;
+
+  // Virtual memory statistics
+  struct {
+    uint64_t total;
+    uint64_t allocated;
+    uint64_t reserved;
+  } virtual;
+
+  // System statistics
+  struct {
+    uint64_t allocations;
+    uint64_t faults;
+    uint64_t swapping;
+  } system;
+
+  // Pool statistics
+  struct {
+    uint32_t pool_count;
+    uint32_t utilization;
+    uint32_t fragmentation;
+  } pools;
+
+  spinlock_t stats_lock;
 } memory_stats_t;
 ```
 
@@ -166,17 +166,17 @@ struct memory_stats_s {
 
 ```c
 struct memory_region_s {
-    uint64_t base_addr;
-    uint64_t length;
-    enum memory_type type;
+  uint64_t base_addr;
+  uint64_t length;
+  enum memory_type type;
 } memory_region_t;
 
 struct memory_map_s {
-    memory_region_t regions[128];
-    size_t region_count;
-    uint64_t total_memory;
-    uint64_t usable_memory;
-    uint64_t highest_addr;
+  memory_region_t regions[128];
+  size_t region_count;
+  uint64_t total_memory;
+  uint64_t usable_memory;
+  uint64_t highest_addr;
 } memory_map_t;
 
 // Memory detection functions

@@ -37,7 +37,6 @@ indent_size = 8
 [*.md]
 indent_style = space
 indent_size = 2
-max_line_length = 80
 trim_trailing_whitespace = false
 
 # YAML files
@@ -55,11 +54,10 @@ indent_size = 2
 indent_style = space
 indent_size = 2
 
-# License and documentation
-[{LICENSE*,README*,CHANGELOG*}]
+# Documentation files
+[{README*,CHANGELOG*}]
 indent_style = space
 indent_size = 2
-max_line_length = 80
 
 # Linker scripts
 [*.ld]

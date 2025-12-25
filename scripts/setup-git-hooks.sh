@@ -17,8 +17,8 @@ echo "Setting up Git hooks for FMI/OS development workflow..."
 
 # Check if we're in a Git repository
 if ! git rev-parse --git-dir > /dev/null 2>&1; then
-    echo -e "${RED}Error: Not in a Git repository${NC}"
-    exit 1
+	echo -e "${RED}Error: Not in a Git repository${NC}"
+	exit 1
 fi
 
 # Get the Git hooks directory
