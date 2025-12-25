@@ -12,21 +12,16 @@ All development work MUST follow the established Git workflow to maintain code q
 
 ## Before Starting Any Work
 
-**MANDATORY STEPS** before creating any topic branch:
+**SIMPLIFIED WORKFLOW** for creating topic branches:
 
-1. **Switch to main branch**:
-   ```bash
-   git checkout main
-   ```
-
-2. **Pull latest changes** (CRITICAL - always do this):
-   ```bash
-   git pull origin main
-   ```
-
-3. **Create topic branch** with proper naming and upstream tracking:
+1. **Create topic branch directly** with proper naming and upstream tracking:
    ```bash
    git checkout -b <type>/<descriptive-name> origin/main
+   ```
+
+2. **Pull latest changes** to ensure branch is up-to-date:
+   ```bash
+   git pull
    ```
 
 ### Branch Types
@@ -37,26 +32,30 @@ All development work MUST follow the established Git workflow to maintain code q
 - **test** - Test improvements
 - **chore** - Maintenance tasks
 
-### Why Upstream Branch Tracking is Important
+### Why This Simplified Workflow is Better
 
-Setting the upstream branch to `origin/main` when creating topic branches provides several benefits:
+Creating topic branches directly from `origin/main` and pulling afterward provides several advantages:
 
-1. **Clear Base Reference**: Always shows relationship to main branch
-2. **Simplified Rebasing**: `git rebase` without arguments rebases against origin/main
-3. **Status Clarity**: `git status` shows how many commits ahead/behind main
-4. **Merge Base**: Git operations automatically use correct merge base
-5. **Branch Cleanup**: Easier to identify stale branches and their relationship to main
+1. **Fewer Steps**: Eliminates need to checkout main and pull before branch creation
+2. **Flexibility**: Can create branches from any current branch state
+3. **Efficiency**: Reduces Git operations and context switching
+4. **Upstream Tracking**: Branch automatically tracks origin/main for clear relationship
+5. **Latest Code**: Pull after creation ensures branch has latest changes
+6. **Cleaner History**: Avoids unnecessary local main branch updates
 
 ### Example Branch Creation
 ```bash
-# Always start fresh from main
-git checkout main
-git pull origin main
-
-# Create appropriately named topic branch with upstream tracking
+# Create topic branch directly from origin/main
 git checkout -b topic/memory-allocator origin/main
+git pull
+
+# Create fix branch directly from origin/main
 git checkout -b fix/console-buffer-overflow origin/main
+git pull
+
+# Create docs branch directly from origin/main
 git checkout -b docs/build-instructions origin/main
+git pull
 ```
 
 ## Task Completion Workflow on Topic Branches
@@ -98,12 +97,11 @@ When completing any task on a topic branch, follow this workflow:
 ## Complete Example Workflow
 
 ```bash
-# 1. ALWAYS start from clean, updated main
-git checkout main
-git pull origin main
-
-# 2. Create topic branch with upstream tracking
+# 1. Create topic branch directly from origin/main with upstream tracking
 git checkout -b topic/slab-allocator origin/main
+
+# 2. Pull latest changes to ensure branch is up-to-date
+git pull
 
 # 3. Make your code changes
 # ... edit files ...
@@ -255,15 +253,15 @@ Direct pushes to protected branches will be rejected with:
 ❌ Direct push to protected branch 'main' is not allowed
 ```
 
-## Why Git Pull is Critical
+## Why Git Pull After Branch Creation is Important
 
-**Always run `git pull origin main` before creating topic branches** because:
+**Running `git pull` after creating topic branches from `origin/main`** ensures:
 
-1. **Prevents Merge Conflicts**: Ensures your branch starts from the latest code
-2. **Maintains Linear History**: Reduces complex merge scenarios
-3. **Catches Integration Issues Early**: Identifies conflicts before development
-4. **Ensures Consistency**: All developers work from the same baseline
-5. **Simplifies Reviews**: PRs show only your changes, not outdated diffs
+1. **Latest Changes**: Branch contains the most recent commits from main
+2. **Conflict Prevention**: Early detection of potential merge conflicts
+3. **Consistent Base**: All developers work from the same code baseline
+4. **Integration Safety**: Reduces risk of integration issues later
+5. **Clean Development**: Start development with known good state
 
 ## Benefits
 
@@ -299,8 +297,11 @@ This workflow is enforced by:
 ❌ **Working directly on main branch**
 ✅ **Always create topic branches**
 
-❌ **Creating topic branch without git pull**
-✅ **Always git pull origin main first**
+❌ **Creating topic branch without upstream tracking**
+✅ **Always use git checkout -b branch-name origin/main**
+
+❌ **Forgetting to pull after branch creation**
+✅ **Always run git pull after creating topic branch**
 
 ❌ **Pushing directly to main**
 ✅ **Push topic branches and create PRs**
