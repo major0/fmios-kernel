@@ -138,6 +138,9 @@ The FMI/OS build system provides a standardized, portable, and maintainable appr
 3. WHEN QEMU testing is enabled, THE Build_System SHALL run kernel smoke tests in QEMU virtual machines
 4. THE Build_System SHALL support testing across multiple target architectures in QEMU
 5. THE Build_System SHALL capture and validate QEMU console output for automated test verification
+6. THE Build_System SHALL use fully qualified paths in all test code to ensure tests work regardless of execution directory
+7. WHEN tests reference build artifacts, THE Build_System SHALL provide absolute paths to kernel binaries and libraries
+8. THE Build_System SHALL ensure property-based tests can locate build artifacts from any working directory
 
 ### Requirement 11: Memory Reclamation Support
 

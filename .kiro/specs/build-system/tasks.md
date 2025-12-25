@@ -16,7 +16,7 @@ This implementation plan establishes an incremental autoconf/automake-based buil
 
 ### Stage 1: Basic x86_64 Build System
 
-- [ ] 1. Set up minimal autoconf/automake infrastructure for x86_64
+- [x] 1. Set up minimal autoconf/automake infrastructure for x86_64
 **Priority: CRITICAL BLOCKER - Required for Stage 1 Hello World kernel**
 **Dependencies: None**
 
@@ -32,15 +32,30 @@ Create minimal build system supporting only x86_64 PVH ELF boot for Stage 1.
 - Focus on minimal working build for Hello World kernel
 - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 1.1 Write property test for basic x86_64 build
+- [x] 1.1 Write property test for basic x86_64 build
   - **Property 1: Basic x86_64 Build Functionality**
   - **Validates: Requirements 1.1, 1.2, 1.3**
+
+- [ ] 1.2 Fix build system to use fully qualified paths
+**Priority: CRITICAL BLOCKER - Required to fix property test path resolution**
+**Dependencies: Task 1.1 (property test implementation)**
+
+Update build system to determine fully qualified top-level directory path and express all other paths relative to topdir variable.
+
+- Configure build system to determine absolute path to project root directory
+- Create topdir variable in configure.ac and substitute into Makefiles
+- Update all Makefile.am files to use $(topdir) for path references
+- Modify property tests to use topdir-relative paths instead of relative paths
+- Update QEMU test paths to use topdir-relative references
+- Ensure all build artifacts use consistent topdir-based path resolution
+- Validate that tests work correctly from any working directory
+- _Requirements: 10.5, 12.4, 12.5_
 
 ### Stage 2: Multiboot2 Support
 
 - [ ] 2. Add ISO generation and GRUB support for Multiboot2
 **Priority: HIGH FUNCTIONALITY - Required for Stage 2 Multiboot2 support**
-**Dependencies: Task 1 (basic x86_64 build system)**
+**Dependencies: Task 1.2 (fully qualified path support)**
 
 Extend build system to support Multiboot2 boot protocol via ISO generation.
 

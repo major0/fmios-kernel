@@ -10,10 +10,11 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-# C source and header files
+# C source and header files - allow mixed tab/space for clang-format alignment
 [*.{c,h}]
-indent_style = tab
+indent_style = unset
 indent_size = 8
+tab_width = 8
 max_line_length = 100
 
 # Assembly files
