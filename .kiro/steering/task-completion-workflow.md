@@ -24,9 +24,9 @@ All development work MUST follow the established Git workflow to maintain code q
    git pull origin main
    ```
 
-3. **Create topic branch** with proper naming:
+3. **Create topic branch** with proper naming and upstream tracking:
    ```bash
-   git checkout -b <type>/<descriptive-name>
+   git checkout -b <type>/<descriptive-name> origin/main
    ```
 
 ### Branch Types
@@ -37,16 +37,26 @@ All development work MUST follow the established Git workflow to maintain code q
 - **test** - Test improvements
 - **chore** - Maintenance tasks
 
+### Why Upstream Branch Tracking is Important
+
+Setting the upstream branch to `origin/main` when creating topic branches provides several benefits:
+
+1. **Clear Base Reference**: Always shows relationship to main branch
+2. **Simplified Rebasing**: `git rebase` without arguments rebases against origin/main
+3. **Status Clarity**: `git status` shows how many commits ahead/behind main
+4. **Merge Base**: Git operations automatically use correct merge base
+5. **Branch Cleanup**: Easier to identify stale branches and their relationship to main
+
 ### Example Branch Creation
 ```bash
 # Always start fresh from main
 git checkout main
 git pull origin main
 
-# Create appropriately named topic branch
-git checkout -b topic/memory-allocator
-git checkout -b fix/console-buffer-overflow  
-git checkout -b docs/build-instructions
+# Create appropriately named topic branch with upstream tracking
+git checkout -b topic/memory-allocator origin/main
+git checkout -b fix/console-buffer-overflow origin/main
+git checkout -b docs/build-instructions origin/main
 ```
 
 ## Task Completion Workflow on Topic Branches
@@ -92,8 +102,8 @@ When completing any task on a topic branch, follow this workflow:
 git checkout main
 git pull origin main
 
-# 2. Create topic branch
-git checkout -b topic/slab-allocator
+# 2. Create topic branch with upstream tracking
+git checkout -b topic/slab-allocator origin/main
 
 # 3. Make your code changes
 # ... edit files ...
