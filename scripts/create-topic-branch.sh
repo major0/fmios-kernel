@@ -167,12 +167,12 @@ git pull origin "$(git branch --show-current)" || {
     echo -e "${YELLOW}⚠️  Could not pull latest changes. Continuing with local state.${NC}"
 }
 
-# Create and checkout the new branch
+# Create and checkout the new branch with upstream tracking
 echo -e "${GREEN}Creating topic branch: $FULL_BRANCH_NAME${NC}"
-git checkout -b "$FULL_BRANCH_NAME"
+git checkout -b "$FULL_BRANCH_NAME" origin/main
 
-# Set up tracking (will be set when first pushed)
-echo -e "${BLUE}Branch '$FULL_BRANCH_NAME' created successfully!${NC}"
+# Branch is now tracking origin/main as upstream
+echo -e "${BLUE}Branch '$FULL_BRANCH_NAME' created successfully with upstream tracking!${NC}"
 echo ""
 echo "Next steps:"
 echo "1. Make your changes and commit them with conventional commit format"
