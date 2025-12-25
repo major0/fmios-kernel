@@ -25,11 +25,11 @@ All functions in kernel subsystems MUST be declared `static` unless there is a s
 ```c
 // CORRECT: Private function by default
 static int slab_cache_create(const char *name, size_t obj_size, size_t align,
-                            void *(*ctor)(void *), void (*dtor)(void *));
+                  void *(*ctor)(void *), void (*dtor)(void *));
 
 // INCORRECT: Public function without justification
 int slab_cache_create(const char *name, size_t obj_size, size_t align,
-                     void *(*ctor)(void *), void (*dtor)(void *));
+          void *(*ctor)(void *), void (*dtor)(void *));
 ```
 
 ### Rule 2: Minimal Public Headers
@@ -61,13 +61,13 @@ int slab_subsystem_setup(void);
 
 /* Internal structures exposed - WRONG */
 struct slab_cache_s {
-    size_t obj_size;
-    /* ... internal details ... */
+  size_t obj_size;
+  /* ... internal details ... */
 };
 
 /* Internal functions exposed - WRONG */
 slab_cache_t *slab_cache_create(const char *name, size_t obj_size, size_t align,
-                                void *(*ctor)(void *), void (*dtor)(void *));
+                      void *(*ctor)(void *), void (*dtor)(void *));
 void slab_cache_destroy(slab_cache_t *cache);
 
 #endif /* _SLAB_H */
@@ -82,20 +82,20 @@ When external code needs to reference internal types, use opaque forward declara
 struct kobj_pool_s;  /* Implementation hidden in kernel/kobject.c */
 
 struct kobj_s {
-    enum kobj_type type;
-    atomic_t ref_count;
-    struct kobj_pool_s *pool;  /* Opaque pointer */
-    /* ... */
+  enum kobj_type type;
+  atomic_t ref_count;
+  struct kobj_pool_s *pool;  /* Opaque pointer */
+  /* ... */
 };
 ```
 
 ```c
 // INCORRECT: Exposing full structure definition
 struct kobj_pool_s {
-    enum kobj_type type;        /* Internal details exposed - WRONG */
-    size_t obj_size;
-    size_t pool_size;
-    /* ... all internal implementation details ... */
+  enum kobj_type type;        /* Internal details exposed - WRONG */
+  size_t obj_size;
+  size_t pool_size;
+  /* ... all internal implementation details ... */
 };
 ```
 
@@ -106,10 +106,10 @@ All internal structures MUST be defined in the implementation file, not headers:
 ```c
 // CORRECT: Internal structure in kernel/slab.c
 struct slab_cache_s {
-    char name[32];              /* Private implementation details */
-    size_t obj_size;
-    size_t align;
-    /* ... */
+  char name[32];              /* Private implementation details */
+  size_t obj_size;
+  size_t align;
+  /* ... */
 };
 typedef struct slab_cache_s slab_cache_t;  /* Local typedef */
 ```

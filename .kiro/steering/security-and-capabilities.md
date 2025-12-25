@@ -64,7 +64,7 @@ if (!capability_check(current_process, CAP_MEMORY_ALLOCATE)) {
 All security-relevant operations must be logged:
 ```c
 // Security audit logging
-audit_log(AUDIT_CAPABILITY_CHECK, "Process %d attempted %s operation", 
+audit_log(AUDIT_CAPABILITY_CHECK, "Process %d attempted %s operation",
           process_id, operation_name);
 ```
 

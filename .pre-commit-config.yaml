@@ -31,6 +31,13 @@ repos:
           "--optional-scopes"
         ]
 
+  # EditorConfig compliance checking
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+    rev: 2.7.3
+    hooks:
+      - id: editorconfig-checker
+        alias: ec
+
   # GPL v2 license header validation
   - repo: local
     hooks:
@@ -86,3 +93,11 @@ repos:
       - id: shellcheck
         files: '\.(sh|bash)$'
         args: ['--severity=warning']
+
+  # Markdown formatting and linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.37.0
+    hooks:
+      - id: markdownlint
+        files: '\.md$'
+        args: ['--config', '.markdownlint.json']

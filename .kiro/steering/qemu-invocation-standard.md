@@ -96,11 +96,11 @@ timeout 60s qemu-system-x86_64 -kernel fmi-kernel -serial mon:stdio -nographic -
 timeout 30s qemu-system-x86_64 -kernel fmi-kernel -serial mon:stdio -nographic
 QEMU_EXIT_CODE=$?
 if [ $QEMU_EXIT_CODE -eq 124 ]; then
-    echo "QEMU timed out after 30 seconds"
+  echo "QEMU timed out after 30 seconds"
 elif [ $QEMU_EXIT_CODE -eq 0 ]; then
-    echo "QEMU exited normally"
+  echo "QEMU exited normally"
 else
-    echo "QEMU exited with error code: $QEMU_EXIT_CODE"
+  echo "QEMU exited with error code: $QEMU_EXIT_CODE"
 fi
 ```
 
@@ -149,12 +149,12 @@ All examples and tutorials MUST:
 ```makefile
 # Example Makefile target with proper timeout
 qemu-test:
-	timeout 30s qemu-system-x86_64 -kernel $(KERNEL) -serial mon:stdio -nographic || \
-	(echo "QEMU test failed or timed out"; exit 1)
+  timeout 30s qemu-system-x86_64 -kernel $(KERNEL) -serial mon:stdio -nographic || \
+  (echo "QEMU test failed or timed out"; exit 1)
 
 # Example with different timeout for debug builds
 qemu-debug:
-	timeout 120s qemu-system-x86_64 -kernel $(KERNEL) -serial mon:stdio -nographic -s -S
+  timeout 120s qemu-system-x86_64 -kernel $(KERNEL) -serial mon:stdio -nographic -s -S
 ```
 
 ### Script Template
@@ -169,23 +169,23 @@ KERNEL_IMAGE="fmi-kernel"
 
 echo "Starting QEMU with ${TIMEOUT_SECONDS}s timeout..."
 timeout ${TIMEOUT_SECONDS}s qemu-system-x86_64 \
-    -kernel "${KERNEL_IMAGE}" \
-    -serial mon:stdio \
-    -nographic
+  -kernel "${KERNEL_IMAGE}" \
+  -serial mon:stdio \
+  -nographic
 
 QEMU_EXIT_CODE=$?
 case $QEMU_EXIT_CODE in
-    0)
-        echo "QEMU exited normally"
-        ;;
-    124)
-        echo "ERROR: QEMU timed out after ${TIMEOUT_SECONDS} seconds"
-        exit 1
-        ;;
-    *)
-        echo "ERROR: QEMU exited with code ${QEMU_EXIT_CODE}"
-        exit 1
-        ;;
+  0)
+    echo "QEMU exited normally"
+    ;;
+  124)
+    echo "ERROR: QEMU timed out after ${TIMEOUT_SECONDS} seconds"
+    exit 1
+    ;;
+  *)
+    echo "ERROR: QEMU exited with code ${QEMU_EXIT_CODE}"
+    exit 1
+    ;;
 esac
 ```
 

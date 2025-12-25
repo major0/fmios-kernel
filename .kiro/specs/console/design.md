@@ -10,7 +10,7 @@ The Console subsystem provides unified kernel output management supporting multi
 
 ```
 Kernel Code → kprintf()/klogf() → Console Multiplexer → Console Drivers → Hardware
-     ↓              ↓                    ↓                    ↓              ↓
+    ↓              ↓                    ↓                    ↓              ↓
   Log Calls    Format/Buffer        Device Selection      Arch-Specific    Serial/Video
   Debug Msgs   Thread Safety        Priority Handling     Implementation   Debug Output
 ```
@@ -38,15 +38,15 @@ arch/riscv64/drivers/serial_console.c   # RISC-V SBI console
 
 ```c
 struct console_driver_s {
-    const char *name;
-    int (*init)(void);
-    int (*putchar)(int c);
-    int (*puts)(const char *s);
-    int (*write)(const void *buf, size_t len);
-    void (*flush)(void);
-    bool (*ready)(void);
-    int priority;
-    bool enabled;
+  const char *name;
+  int (*init)(void);
+  int (*putchar)(int c);
+  int (*puts)(const char *s);
+  int (*write)(const void *buf, size_t len);
+  void (*flush)(void);
+  bool (*ready)(void);
+  int priority;
+  bool enabled;
 } console_driver_t;
 
 // Console driver registration
@@ -58,12 +58,12 @@ int console_unregister_driver(console_driver_t *driver);
 
 ```c
 struct console_multiplexer_s {
-    console_driver_t *drivers[MAX_CONSOLE_DRIVERS];
-    size_t driver_count;
-    console_driver_t *primary_console;
-    console_driver_t *boot_console;
-    spinlock_t mux_lock;
-    bool early_init_complete;
+  console_driver_t *drivers[MAX_CONSOLE_DRIVERS];
+  size_t driver_count;
+  console_driver_t *primary_console;
+  console_driver_t *boot_console;
+  spinlock_t mux_lock;
+  bool early_init_complete;
 } console_multiplexer_t;
 
 // Console output functions
@@ -77,11 +77,11 @@ void console_flush(void);
 
 ```c
 enum log_level {
-    LOG_DEBUG = 0,
-    LOG_INFO = 1,
-    LOG_WARN = 2,
-    LOG_ERROR = 3,
-    LOG_CRITICAL = 4
+  LOG_DEBUG = 0,
+  LOG_INFO = 1,
+  LOG_WARN = 2,
+  LOG_ERROR = 3,
+  LOG_CRITICAL = 4
 };
 
 // Kernel logging functions
@@ -100,15 +100,15 @@ enum log_level klog_get_level(void);
 
 ```c
 struct console_state_s {
-    console_multiplexer_t multiplexer;
-    enum log_level current_log_level;
-    char *message_buffer;
-    size_t buffer_size;
-    size_t buffer_used;
-    spinlock_t state_lock;
-    bool emergency_mode;
-    uint64_t message_count;
-    uint64_t error_count;
+  console_multiplexer_t multiplexer;
+  enum log_level current_log_level;
+  char *message_buffer;
+  size_t buffer_size;
+  size_t buffer_used;
+  spinlock_t state_lock;
+  bool emergency_mode;
+  uint64_t message_count;
+  uint64_t error_count;
 } console_state_t;
 ```
 
@@ -116,12 +116,12 @@ struct console_state_s {
 
 ```c
 struct console_config_s {
-    char device_name[32];      // e.g., "ttyS0"
-    uint32_t baud_rate;        // e.g., 115200
-    uint8_t data_bits;         // e.g., 8
-    uint8_t stop_bits;         // e.g., 1
-    char parity;               // 'N', 'E', 'O'
-    bool flow_control;         // Hardware flow control
+  char device_name[32];      // e.g., "ttyS0"
+  uint32_t baud_rate;        // e.g., 115200
+  uint8_t data_bits;         // e.g., 8
+  uint8_t stop_bits;         // e.g., 1
+  char parity;               // 'N', 'E', 'O'
+  bool flow_control;         // Hardware flow control
 } console_config_t;
 
 // Parse console boot parameters
@@ -132,15 +132,15 @@ int console_parse_boot_params(const char *cmdline, console_config_t *config);
 
 ```c
 struct log_message_s {
-    uint64_t timestamp;        // Jiffies since boot
-    enum log_level level;
-    char message[MAX_LOG_MESSAGE_SIZE];
-    size_t message_len;
+  uint64_t timestamp;        // Jiffies since boot
+  enum log_level level;
+  char message[MAX_LOG_MESSAGE_SIZE];
+  size_t message_len;
 } log_message_t;
 
 // Format log message with timestamp and level
-int format_log_message(log_message_t *msg, enum log_level level, 
-                      const char *format, va_list args);
+int format_log_message(log_message_t *msg, enum log_level level,
+            const char *format, va_list args);
 ```
 
 ## Correctness Properties

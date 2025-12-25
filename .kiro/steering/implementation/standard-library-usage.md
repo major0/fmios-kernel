@@ -88,15 +88,15 @@ vsnprintf(buffer, sizeof(buffer), format, args);       // Safe formatting with v
 ```c
 // PROHIBITED: Unsafe standard library functions
 #define strcpy(dest, src) \
-    _Static_assert(0, "strcpy is prohibited - use strncpy with bounds checking")
+  _Static_assert(0, "strcpy is prohibited - use strncpy with bounds checking")
 #define strcat(dest, src) \
-    _Static_assert(0, "strcat is prohibited - use strncat with bounds checking")
+  _Static_assert(0, "strcat is prohibited - use strncat with bounds checking")
 #define sprintf(buf, fmt, ...) \
-    _Static_assert(0, "sprintf is prohibited - use snprintf with buffer size")
+  _Static_assert(0, "sprintf is prohibited - use snprintf with buffer size")
 #define vsprintf(buf, fmt, args) \
-    _Static_assert(0, "vsprintf is prohibited - use vsnprintf with buffer size")
+  _Static_assert(0, "vsprintf is prohibited - use vsnprintf with buffer size")
 #define gets(buf) \
-    _Static_assert(0, "gets is prohibited - use fgets or other safe input")
+  _Static_assert(0, "gets is prohibited - use fgets or other safe input")
 ```
 
 ### Custom String Implementations (PROHIBITED)
@@ -104,25 +104,25 @@ vsnprintf(buffer, sizeof(buffer), format, args);       // Safe formatting with v
 ```c
 // PROHIBITED: Custom string function implementations
 #define kstrlen(s) \
-    _Static_assert(0, "kstrlen is prohibited - use standard strlen")
+  _Static_assert(0, "kstrlen is prohibited - use standard strlen")
 #define kstrcpy(dest, src) \
-    _Static_assert(0, "kstrcpy is prohibited - use standard strncpy with bounds checking")
+  _Static_assert(0, "kstrcpy is prohibited - use standard strncpy with bounds checking")
 #define kstrncpy(dest, src, n) \
-    _Static_assert(0, "kstrncpy is prohibited - use standard strncpy")
+  _Static_assert(0, "kstrncpy is prohibited - use standard strncpy")
 #define kstrcmp(s1, s2) \
-    _Static_assert(0, "kstrcmp is prohibited - use standard strcmp")
+  _Static_assert(0, "kstrcmp is prohibited - use standard strcmp")
 #define kstrncmp(s1, s2, n) \
-    _Static_assert(0, "kstrncmp is prohibited - use standard strncmp")
+  _Static_assert(0, "kstrncmp is prohibited - use standard strncmp")
 
 // PROHIBITED: Custom memory function implementations
 #define kmemset(s, c, n) \
-    _Static_assert(0, "kmemset is prohibited - use standard memset")
+  _Static_assert(0, "kmemset is prohibited - use standard memset")
 #define kmemcpy(dest, src, n) \
-    _Static_assert(0, "kmemcpy is prohibited - use standard memcpy")
+  _Static_assert(0, "kmemcpy is prohibited - use standard memcpy")
 #define kmemcmp(s1, s2, n) \
-    _Static_assert(0, "kmemcmp is prohibited - use standard memcmp")
+  _Static_assert(0, "kmemcmp is prohibited - use standard memcmp")
 #define kmemmove(dest, src, n) \
-    _Static_assert(0, "kmemmove is prohibited - use standard memmove")
+  _Static_assert(0, "kmemmove is prohibited - use standard memmove")
 ```
 
 ### Prohibited Source Files
@@ -130,7 +130,7 @@ vsnprintf(buffer, sizeof(buffer), format, args);       // Safe formatting with v
 The following types of source files are PROHIBITED:
 
 - `kstring.c` - Custom string function implementations
-- `kmemory.c` - Custom memory function implementations  
+- `kmemory.c` - Custom memory function implementations
 - `kstr*.c` - Any custom string-related implementations
 - `kmem*.c` - Any custom memory operation implementations (except kernel allocators)
 
@@ -188,28 +188,28 @@ void kassert(int condition, const char *message);  // Kernel assertions
 ```c
 // Safe string copying
 void safe_string_copy(char *dest, const char *src, size_t dest_size) {
-    if (dest_size > 0) {
-        strncpy(dest, src, dest_size - 1);
-        dest[dest_size - 1] = '\0';  // Ensure null termination
-    }
+  if (dest_size > 0) {
+    strncpy(dest, src, dest_size - 1);
+    dest[dest_size - 1] = '\0';  // Ensure null termination
+  }
 }
 
 // Safe string concatenation
 void safe_string_concat(char *dest, const char *src, size_t dest_size) {
-    size_t current_len = strlen(dest);
-    size_t remaining = dest_size - current_len - 1;
-    if (remaining > 0) {
-        strncat(dest, src, remaining);
-    }
+  size_t current_len = strlen(dest);
+  size_t remaining = dest_size - current_len - 1;
+  if (remaining > 0) {
+    strncat(dest, src, remaining);
+  }
 }
 
 // Safe formatted output
 void safe_format_string(char *buffer, size_t buffer_size, const char *format, ...) {
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, buffer_size, format, args);
-    va_end(args);
-    buffer[buffer_size - 1] = '\0';  // Ensure null termination
+  va_list args;
+  va_start(args, format);
+  vsnprintf(buffer, buffer_size, format, args);
+  va_end(args);
+  buffer[buffer_size - 1] = '\0';  // Ensure null termination
 }
 ```
 
@@ -225,26 +225,26 @@ The build system MUST detect and prevent prohibited implementations:
 
 # Detect custom string function implementations
 if grep -r "kstr\(len\|cpy\|ncpy\|cmp\|ncmp\)" --include="*.c" --include="*.h" .; then
-    echo "ERROR: Custom string functions found - use standard library functions"
-    exit 1
+  echo "ERROR: Custom string functions found - use standard library functions"
+  exit 1
 fi
 
-# Detect custom memory function implementations  
+# Detect custom memory function implementations
 if grep -r "k\(memset\|memcpy\|memcmp\|memmove\)" --include="*.c" --include="*.h" .; then
-    echo "ERROR: Custom memory functions found - use standard library functions"
-    exit 1
+  echo "ERROR: Custom memory functions found - use standard library functions"
+  exit 1
 fi
 
 # Detect unsafe function usage
 if grep -r "\b\(strcpy\|strcat\|sprintf\|vsprintf\|gets\)\s*(" --include="*.c" .; then
-    echo "ERROR: Unsafe functions found - use safe alternatives"
-    exit 1
+  echo "ERROR: Unsafe functions found - use safe alternatives"
+  exit 1
 fi
 
 # Detect prohibited source files
 if find . -name "kstring.c" -o -name "kmemory.c" -o -name "kstr*.c"; then
-    echo "ERROR: Prohibited source files found - remove custom implementations"
-    exit 1
+  echo "ERROR: Prohibited source files found - remove custom implementations"
+  exit 1
 fi
 
 echo "Standard library usage validation passed"
@@ -255,9 +255,9 @@ echo "Standard library usage validation passed"
 ```makefile
 # Add to kernel Makefile.am
 check-stdlib-usage:
-	@echo "Checking standard library usage compliance..."
-	@$(top_srcdir)/scripts/check-stdlib-usage.sh
-	@echo "Standard library usage validation passed"
+  @echo "Checking standard library usage compliance..."
+  @$(top_srcdir)/scripts/check-stdlib-usage.sh
+  @echo "Standard library usage validation passed"
 
 # Make it part of the build process
 all-local: check-stdlib-usage

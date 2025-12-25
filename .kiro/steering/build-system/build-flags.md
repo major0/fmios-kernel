@@ -78,7 +78,7 @@ When building kernel code (any code in `kernel/` directory), the following flags
 - Branch prediction barriers: `lfence` after conditional branches accessing sensitive data
 - Serializing instructions (`cpuid`, `lfence`) before privileged operations
 
-#### ARM64 Flags  
+#### ARM64 Flags
 - `-mcpu=cortex-a57` - Target Cortex-A57 processor
 - `-mgeneral-regs-only` - Use general-purpose registers only (no NEON/FP)
 
@@ -113,7 +113,7 @@ When building kernel code (any code in `kernel/` directory), the following flags
 
 ### Include Paths for Kernel (Set by Makefile.am)
 - `-Iinclude` - Generic headers
-- `-Ilib/c` - Kernel libc headers  
+- `-Ilib/c` - Kernel libc headers
 - `-Iarch/$(target_arch)/include` - Architecture-specific headers (via symlink)
 
 ### Linker Paths for Kernel (Set by Makefile.am)
@@ -177,7 +177,7 @@ AM_LDFLAGS = $(KERNEL_LDFLAGS) $(ARCH_LDFLAGS)
 # Include paths
 AM_CPPFLAGS = -Iinclude -Ilib/c -Iarch/$(target_arch)/include
 
-# Linker library paths  
+# Linker library paths
 LDADD = -Llib/c -Llib/arch
 ```
 
@@ -225,7 +225,7 @@ fmios/
 ├── include/           # Generic headers (-Iinclude)
 │   └── arch -> ../arch/x86_64/include  # Architecture symlink
 ├── lib/               # Generic libraries
-│   ├── arch -> ../arch/x86_64/lib      # Architecture symlink  
+│   ├── arch -> ../arch/x86_64/lib      # Architecture symlink
 │   └── c/             # Kernel C library (-Ilib/c, -Llib/c)
 ├── arch/x86_64/       # Architecture-specific code
 │   ├── include/       # x86_64 headers (via symlink)
@@ -242,7 +242,7 @@ KERNEL_LDFLAGS = -nostdlib -static $(ARCH_LDFLAGS)
 KERNEL_CPPFLAGS = -Iinclude -Ilib/c -Iarch/$(target_arch)/include
 
 TEST_CFLAGS = -Wall -Wextra -Werror -O0 -g -D_POSIX_C_SOURCE=200809L
-TEST_LDFLAGS = 
+TEST_LDFLAGS =
 TEST_CPPFLAGS = -Iinclude -Ilib/c -Itests/unity/src -Itests
 ```
 

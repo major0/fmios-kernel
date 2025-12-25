@@ -15,43 +15,43 @@ This document establishes the guidelines and requirements for creating and maint
 
 **NEVER include the following in task lists:**
 
-1. **Estimated Effort Information**: 
-   - No "Estimated Effort: X days/hours/weeks"
-   - No time-based estimates of any kind
-   - No duration predictions or scheduling information
+1. **Estimated Effort Information**:
+  - No "Estimated Effort: X days/hours/weeks"
+  - No time-based estimates of any kind
+  - No duration predictions or scheduling information
 
 2. **Time-Based Priorities**:
-   - No priorities based on estimated completion time
-   - No "quick wins" or "low-hanging fruit" classifications based on time
+  - No priorities based on estimated completion time
+  - No "quick wins" or "low-hanging fruit" classifications based on time
 
 3. **Deadline References**:
-   - No target completion dates
-   - No milestone timing information
-   - No schedule-driven task ordering
+  - No target completion dates
+  - No milestone timing information
+  - No schedule-driven task ordering
 
 ### Required Elements
 
 **ALWAYS include the following in task lists:**
 
 1. **Clear Task Descriptions**:
-   - Specific, actionable task descriptions
-   - Clear objectives and deliverables
-   - Technical requirements and constraints
+  - Specific, actionable task descriptions
+  - Clear objectives and deliverables
+  - Technical requirements and constraints
 
 2. **Dependency-Based Ordering**:
-   - Tasks ordered by technical dependencies
-   - Clear prerequisite relationships
-   - Logical progression from foundation to implementation
+  - Tasks ordered by technical dependencies
+  - Clear prerequisite relationships
+  - Logical progression from foundation to implementation
 
 3. **Priority Classifications**:
-   - Priority based on technical importance (CRITICAL, HIGH, MEDIUM, LOW)
-   - Priority based on blocking relationships
-   - Priority based on system stability and safety requirements
+  - Priority based on technical importance (CRITICAL, HIGH, MEDIUM, LOW)
+  - Priority based on blocking relationships
+  - Priority based on system stability and safety requirements
 
 4. **Requirement Traceability**:
-   - Each task references specific requirements
-   - Clear mapping between tasks and acceptance criteria
-   - Validation that all requirements are covered
+  - Each task references specific requirements
+  - Clear mapping between tasks and acceptance criteria
+  - Validation that all requirements are covered
 
 ## Task Format Standards
 
@@ -90,25 +90,25 @@ This document establishes the guidelines and requirements for creating and maint
 
 ### Priority Levels
 
-1. **CRITICAL**: 
-   - System safety and security requirements
-   - Blocking dependencies for multiple other tasks
-   - Core functionality without which the system cannot operate
+1. **CRITICAL**:
+  - System safety and security requirements
+  - Blocking dependencies for multiple other tasks
+  - Core functionality without which the system cannot operate
 
 2. **HIGH**:
-   - Important functionality required for system operation
-   - Dependencies for other high-priority tasks
-   - Significant impact on system reliability or performance
+  - Important functionality required for system operation
+  - Dependencies for other high-priority tasks
+  - Significant impact on system reliability or performance
 
 3. **MEDIUM**:
-   - Important features that enhance system functionality
-   - Dependencies for lower-priority tasks
-   - Moderate impact on system usability
+  - Important features that enhance system functionality
+  - Dependencies for lower-priority tasks
+  - Moderate impact on system usability
 
 4. **LOW**:
-   - Nice-to-have features
-   - No blocking dependencies
-   - Minimal impact on core system operation
+  - Nice-to-have features
+  - No blocking dependencies
+  - Minimal impact on core system operation
 
 ### Priority Justification
 

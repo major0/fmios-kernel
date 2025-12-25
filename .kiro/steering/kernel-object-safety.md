@@ -59,7 +59,7 @@ list_init(&subsystem->item_list, &subsystem->kobj);
 To prevent deadlocks, all kobj-safe data structures follow strict lock hierarchy:
 
 1. **Global Subsystem Locks** (highest priority)
-2. **Owner Object Locks** (medium priority)  
+2. **Owner Object Locks** (medium priority)
 3. **Data Structure Locks** (lowest priority)
 
 **Rule**: Always acquire locks in order from highest to lowest priority.

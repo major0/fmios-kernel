@@ -38,7 +38,7 @@ The FMI/OS build system provides a standardized, portable, and maintainable appr
 #### Acceptance Criteria
 
 1. WHEN a developer specifies --target=x86_64-fmios, THE Build_System SHALL configure for x86_64 architecture
-2. WHEN a developer specifies --target=aarch64-fmios, THE Build_System SHALL configure for ARM64 architecture  
+2. WHEN a developer specifies --target=aarch64-fmios, THE Build_System SHALL configure for ARM64 architecture
 3. WHEN a developer specifies --target=riscv64-fmios, THE Build_System SHALL configure for RISC-V architecture
 4. THE Build_System SHALL set architecture-specific compiler flags based on the target selection
 5. THE Build_System SHALL manage architecture-specific include and library paths automatically

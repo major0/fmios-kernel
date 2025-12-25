@@ -10,7 +10,7 @@ The KFS (Kernel Filesystem) Namespace subsystem provides a complete filesystem i
 
 ```
 User/Kernel → VFS Operations → KFS Router → Service Handlers → Kernel/Userland
-     ↓              ↓              ↓              ↓              ↓
+    ↓              ↓              ↓              ↓              ↓
   File Commands   open/read/     Path Resolution  Handler       Service
   ls, cat, etc.   write/stat     Service Lookup   Selection     Implementation
 ```
@@ -34,12 +34,12 @@ User/Kernel → VFS Operations → KFS Router → Service Handlers → Kernel/Us
 
 ```c
 struct vfs_operations_s {
-    int (*open)(const char *path, int flags);
-    int (*close)(int fd);
-    ssize_t (*read)(int fd, void *buf, size_t count);
-    ssize_t (*write)(int fd, const void *buf, size_t count);
-    int (*readdir)(const char *path, struct dirent *entries, size_t max_entries);
-    int (*stat)(const char *path, struct stat *statbuf);
+  int (*open)(const char *path, int flags);
+  int (*close)(int fd);
+  ssize_t (*read)(int fd, void *buf, size_t count);
+  ssize_t (*write)(int fd, const void *buf, size_t count);
+  int (*readdir)(const char *path, struct dirent *entries, size_t max_entries);
+  int (*stat)(const char *path, struct stat *statbuf);
 } vfs_operations_t;
 ```
 
@@ -47,13 +47,13 @@ struct vfs_operations_s {
 
 ```c
 struct service_entry_s {
-    char name[64];
-    char path[256];
-    vfs_operations_t *operations;
-    void *service_data;
-    uint32_t permissions;
-    struct list_head service_list;
-    kobj_t service_kobj;
+  char name[64];
+  char path[256];
+  vfs_operations_t *operations;
+  void *service_data;
+  uint32_t permissions;
+  struct list_head service_list;
+  kobj_t service_kobj;
 } service_entry_t;
 
 int kfs_register_service(const char *path, vfs_operations_t *ops, void *data);

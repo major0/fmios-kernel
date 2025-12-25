@@ -30,7 +30,7 @@ This roadmap defines the incremental development approach for FMI/OS, focusing o
 - `console` - Direct serial output only
 - `testing-framework` - Basic QEMU smoke tests
 
-**Success Criteria**: 
+**Success Criteria**:
 - Kernel boots in QEMU with `-kernel` flag
 - Prints "Hello World from FMI/OS" to serial console
 - Cleanly halts after message
@@ -53,7 +53,7 @@ This roadmap defines the incremental development approach for FMI/OS, focusing o
 - Same "Hello World" output regardless of boot method
 - QEMU testing with both `-kernel` and `-cdrom` methods
 
-### Stage 3: x86_64 UEFI Support  
+### Stage 3: x86_64 UEFI Support
 **Goal**: Add UEFI boot protocol support
 
 **Deliverables**:
@@ -98,7 +98,7 @@ This roadmap defines the incremental development approach for FMI/OS, focusing o
 **Deliverables**:
 - ARM64 bootstrap code
 - ARM64 U-Boot support (primary)
-- ARM64 UEFI support  
+- ARM64 UEFI support
 - ARM64 console drivers
 - ARM64 memory management
 - Complete feature parity with x86_64
@@ -120,7 +120,7 @@ This roadmap defines the incremental development approach for FMI/OS, focusing o
 - RISC-V bootstrap code
 - RISC-V U-Boot support (primary)
 - RISC-V UEFI support
-- RISC-V console drivers  
+- RISC-V console drivers
 - RISC-V memory management
 - Complete three-architecture support
 
@@ -146,7 +146,7 @@ This roadmap defines the incremental development approach for FMI/OS, focusing o
 ### Architecture Progression Rules
 
 1. **x86_64 First**: Complete all x86_64 boot modes before starting ARM64
-2. **ARM64 Second**: Complete all ARM64 boot modes before starting RISC-V  
+2. **ARM64 Second**: Complete all ARM64 boot modes before starting RISC-V
 3. **RISC-V Last**: Complete final architecture with full feature parity
 4. **No Parallel Architecture Work**: Focus on one architecture at a time
 
@@ -169,7 +169,7 @@ This roadmap defines the incremental development approach for FMI/OS, focusing o
 ### Bootstrap Spec Stages
 - Stage 1: PVH ELF x86_64 only
 - Stage 2: Add Multiboot2 to x86_64
-- Stage 3: Add UEFI to x86_64  
+- Stage 3: Add UEFI to x86_64
 - Stage 5: ARM64 U-Boot + UEFI
 - Stage 6: RISC-V U-Boot + UEFI
 
@@ -199,11 +199,11 @@ This roadmap defines the incremental development approach for FMI/OS, focusing o
 
 ### Stage 1 Success
 - [ ] Kernel boots in QEMU via PVH ELF
-- [ ] Prints "Hello World from FMI/OS" 
+- [ ] Prints "Hello World from FMI/OS"
 - [ ] Shows basic system information
 - [ ] Cleanly halts
 
-### Stage 2 Success  
+### Stage 2 Success
 - [ ] All Stage 1 functionality maintained
 - [ ] Kernel boots via Multiboot2 (GRUB/ISO)
 - [ ] Boot protocol detection working

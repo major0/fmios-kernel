@@ -6,7 +6,7 @@ This implementation plan establishes an incremental autoconf/automake-based buil
 
 **INCREMENTAL APPROACH**:
 - Stage 1: Basic x86_64 autoconf/automake for Hello World kernel
-- Stage 2: Add ISO generation for Multiboot2 support  
+- Stage 2: Add ISO generation for Multiboot2 support
 - Stage 3: Add UEFI application generation
 - Stage 4: Enhanced build features for expanded kernel functionality
 - Stage 5: ARM64 cross-compilation support

@@ -168,7 +168,7 @@ Project headers should always use quotes:
 
 A **module** consists of a header file and its corresponding implementation file(s):
 - `list.h` and `list.c` form one module
-- `memory.h` and `memory.c` form one module  
+- `memory.h` and `memory.c` form one module
 - `process.h` and `process.c` form one module
 
 ### Allowed Forward Declarations (Within Module Scope)
@@ -186,7 +186,7 @@ typedef struct list_s {
 } list_t;
 ```
 
-#### Source Files - Internal Forward Declarations  
+#### Source Files - Internal Forward Declarations
 ```c
 // In lib/list.c - ALLOWED: Forward declarations for internal functions
 static struct list_node_s *find_node(list_t *list, void *data);  // OK: Internal function
@@ -291,7 +291,7 @@ typedef struct memory_space_s memory_space_t;
 #include "common_types.h"
 #include "memory.h"         // Full include, no forward declaration
 
-// In include/memory.h  
+// In include/memory.h
 #include "common_types.h"
 #include "process.h"        // Full include, no forward declaration
 ```

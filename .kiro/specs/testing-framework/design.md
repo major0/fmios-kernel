@@ -115,7 +115,7 @@ The testing framework follows a layered architecture that separates concerns and
 - Integration with existing test infrastructure
 - Support for custom generators and constraints
 
-**Implementation Strategy**: 
+**Implementation Strategy**:
 - Extend Ceedling with custom Ruby tasks for property-based testing
 - Implement C-based property testing library with random generation
 - Provide macros and utilities for defining properties and generators
@@ -136,10 +136,10 @@ PROPERTY_TEST(list_add_preserves_count, 100) {
     list_t list;
     int initial_count = random_int_range(0, 100);
     int item = random_int();
-    
+
     // Setup list with initial_count items
     setup_list_with_count(&list, initial_count);
-    
+
     // Add item and verify count increases by 1
     list_add(&list, &item);
     TEST_ASSERT_EQUAL(initial_count + 1, list_count(&list));
@@ -260,20 +260,20 @@ typedef struct test_config_s {
     char build_root[256];
     char test_file_prefix[16];
     char source_file_prefix[16];
-    
+
     struct {
         char test_paths[MAX_PATHS][256];
         char source_paths[MAX_PATHS][256];
         char include_paths[MAX_PATHS][256];
         int path_count[3];  // test, source, include
     } paths;
-    
+
     struct {
         char test_defines[MAX_DEFINES][64];
         char source_defines[MAX_DEFINES][64];
         int define_count[2];  // test, source
     } defines;
-    
+
     struct {
         bool enabled;
         char mock_prefix[16];
@@ -281,7 +281,7 @@ typedef struct test_config_s {
         char plugins[MAX_PLUGINS][32];
         int plugin_count;
     } cmock;
-    
+
     struct {
         bool enabled;
         char report_types[MAX_REPORTS][32];
@@ -304,20 +304,20 @@ typedef struct test_result_s {
         TEST_IGNORED,
         TEST_ERROR
     } status;
-    
+
     struct {
         int total;
         int passed;
         int failed;
         int ignored;
     } assertions;
-    
+
     struct {
         double execution_time;
         size_t memory_used;
         int iterations;  // For property-based tests
     } metrics;
-    
+
     struct {
         char message[512];
         char file[256];
@@ -325,7 +325,7 @@ typedef struct test_result_s {
         char expected[256];
         char actual[256];
     } failure_info;
-    
+
     struct {
         double line_coverage;
         double branch_coverage;
@@ -341,21 +341,21 @@ typedef struct qemu_test_config_s {
     char architecture[16];      // x86_64, arm64, riscv64
     char qemu_binary[64];       // qemu-system-x86_64, etc.
     char kernel_image[256];     // Path to test kernel
-    
+
     struct {
         int timeout_seconds;
         int memory_mb;
         int cpu_cores;
         char additional_args[512];
     } parameters;
-    
+
     struct {
         char expected_patterns[MAX_PATTERNS][128];
         int pattern_count;
         char error_patterns[MAX_PATTERNS][128];
         int error_pattern_count;
     } validation;
-    
+
     struct {
         char output_file[256];
         bool capture_serial;

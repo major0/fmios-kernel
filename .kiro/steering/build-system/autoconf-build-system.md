@@ -74,7 +74,7 @@ fmios/
 ```bash
 # Configure for specific architectures
 ./configure --target=x86_64-fmios
-./configure --target=aarch64-fmios  
+./configure --target=aarch64-fmios
 ./configure --target=riscv64-fmios
 ```
 
@@ -116,11 +116,11 @@ SUBDIRS = lib drivers arch/$(target_arch) kernel tests
 
 # Architecture symlink management
 all-local:
-	$(LN_S) -f ../arch/$(target_arch)/include include/arch
-	$(LN_S) -f ../arch/$(target_arch)/lib lib/arch
+  $(LN_S) -f ../arch/$(target_arch)/include include/arch
+  $(LN_S) -f ../arch/$(target_arch)/lib lib/arch
 
 clean-local:
-	rm -f include/arch lib/arch
+  rm -f include/arch lib/arch
 
 # Distribution files
 EXTRA_DIST = docs/ scripts/
@@ -133,16 +133,16 @@ BUILT_SOURCES = include/arch lib/arch
 ```makefile
 # Architecture-specific sources
 arch_SOURCES = \
-	bootstrap.S \
-	entry.S \
-	interrupts.c \
-	mmu.c \
-	context.c
+  bootstrap.S \
+  entry.S \
+  interrupts.c \
+  mmu.c \
+  context.c
 
 # Architecture-specific drivers
 driver_SOURCES = \
-	drivers/serial_console.c \
-	drivers/video_console.c
+  drivers/serial_console.c \
+  drivers/video_console.c
 
 # Build libarch.a for this architecture
 noinst_LIBRARIES = libarch.a
@@ -162,18 +162,18 @@ archinclude_HEADERS = include/*.h
 ```autoconf
 # Architecture-specific compiler flags
 case "$target_arch" in
-    x86_64)
-        ARCH_CFLAGS="-mcmodel=kernel -mno-red-zone -mno-mmx -mno-sse -mno-sse2"
-        ARCH_LDFLAGS="-z max-page-size=0x1000"
-        ;;
-    aarch64)
-        ARCH_CFLAGS="-mcpu=cortex-a57 -mgeneral-regs-only"
-        ARCH_LDFLAGS=""
-        ;;
-    riscv64)
-        ARCH_CFLAGS="-march=rv64imac -mabi=lp64"
-        ARCH_LDFLAGS=""
-        ;;
+  x86_64)
+    ARCH_CFLAGS="-mcmodel=kernel -mno-red-zone -mno-mmx -mno-sse -mno-sse2"
+    ARCH_LDFLAGS="-z max-page-size=0x1000"
+    ;;
+  aarch64)
+    ARCH_CFLAGS="-mcpu=cortex-a57 -mgeneral-regs-only"
+    ARCH_LDFLAGS=""
+    ;;
+  riscv64)
+    ARCH_CFLAGS="-march=rv64imac -mabi=lp64"
+    ARCH_LDFLAGS=""
+    ;;
 esac
 
 # Kernel build flags with Position Independent Code, Speculative Execution Protection, and Bounds Checking
@@ -187,7 +187,7 @@ KERNEL_CFLAGS="$KERNEL_CFLAGS -Iinclude -Ilib/c $ARCH_CFLAGS"
 
 # Debug build additional flags for enhanced bounds checking
 if test "x$enable_debug" = "xyes"; then
-    KERNEL_CFLAGS="$KERNEL_CFLAGS -fsanitize=bounds -D_FORTIFY_SOURCE=2"
+  KERNEL_CFLAGS="$KERNEL_CFLAGS -fsanitize=bounds -D_FORTIFY_SOURCE=2"
 fi
 
 KERNEL_LDFLAGS="-nostdlib -static -Llib/c -Llib/arch $ARCH_LDFLAGS"
@@ -214,9 +214,9 @@ The configure script and Makefiles must manage architecture symlinks:
 ```bash
 # In configure.ac
 AC_CONFIG_COMMANDS([arch-symlinks], [
-    rm -f include/arch lib/arch
-    ln -sf ../arch/$target_arch/include include/arch
-    ln -sf ../arch/$target_arch/lib lib/arch
+  rm -f include/arch lib/arch
+  ln -sf ../arch/$target_arch/include include/arch
+  ln -sf ../arch/$target_arch/lib lib/arch
 ], [target_arch=$target_arch])
 ```
 
@@ -224,10 +224,10 @@ AC_CONFIG_COMMANDS([arch-symlinks], [
 ```makefile
 # In top-level Makefile.am
 clean-local:
-	rm -f include/arch lib/arch
+  rm -f include/arch lib/arch
 
 distclean-local:
-	rm -f include/arch lib/arch
+  rm -f include/arch lib/arch
 ```
 
 ## Code Organization Rules
@@ -254,12 +254,12 @@ The main kernel entry point and subsystem initializers are located in `kernel/ma
 The custom linker script can group initialization code:
 ```ld
 .init : {
-    *kernel/main.o(.text)     /* Entry point and initializers */
-    *kernel/main.o(.rodata)   /* Initialization data */
+  *kernel/main.o(.text)     /* Entry point and initializers */
+  *kernel/main.o(.rodata)   /* Initialization data */
 } > RAM
 
 .text : {
-    *(.text)                  /* Runtime kernel code */
+  *(.text)                  /* Runtime kernel code */
 } > RAM
 ```
 
@@ -272,7 +272,7 @@ After scheduler startup, the `.init` section can be freed to reclaim memory.
 - Move x86_64-specific port addresses
 - Keep generic console interface in generic code
 
-#### Video Console Driver (arch/x86_64/drivers/video_console.c)  
+#### Video Console Driver (arch/x86_64/drivers/video_console.c)
 - Move VGA memory mapping (0xB8000)
 - Move x86_64-specific video initialization
 - Keep generic text rendering in generic code
@@ -297,17 +297,17 @@ Generic drivers provide architecture-neutral interfaces:
 # In tests/Makefile.am
 check-local:
 if ENABLE_QEMU_TESTING
-	$(MAKE) qemu-test-$(target_arch)
+  $(MAKE) qemu-test-$(target_arch)
 endif
 
 qemu-test-x86_64:
-	qemu-system-x86_64 -kernel kernel/fmi-kernel -serial mon:stdio -nographic
+  qemu-system-x86_64 -kernel kernel/fmi-kernel -serial mon:stdio -nographic
 
 qemu-test-aarch64:
-	qemu-system-aarch64 -machine virt -kernel kernel/fmi-kernel -serial mon:stdio -nographic
+  qemu-system-aarch64 -machine virt -kernel kernel/fmi-kernel -serial mon:stdio -nographic
 
 qemu-test-riscv64:
-	qemu-system-riscv64 -machine virt -kernel kernel/fmi-kernel -serial mon:stdio -nographic
+  qemu-system-riscv64 -machine virt -kernel kernel/fmi-kernel -serial mon:stdio -nographic
 ```
 
 ## Code Quality Enforcement
@@ -322,9 +322,9 @@ The build system MUST enforce code quality standards to prevent maintenance issu
 ```makefile
 # In configure.ac - Add forward declaration checking
 AC_ARG_ENABLE([strict-headers],
-    AS_HELP_STRING([--enable-strict-headers], [Enable strict header validation (default: yes)]),
-    [enable_strict_headers=$enableval],
-    [enable_strict_headers=yes])
+  AS_HELP_STRING([--enable-strict-headers], [Enable strict header validation (default: yes)]),
+  [enable_strict_headers=$enableval],
+  [enable_strict_headers=yes])
 
 AM_CONDITIONAL([ENABLE_STRICT_HEADERS], [test "x$enable_strict_headers" = "xyes"])
 ```
@@ -334,9 +334,9 @@ AM_CONDITIONAL([ENABLE_STRICT_HEADERS], [test "x$enable_strict_headers" = "xyes"
 # In top-level Makefile.am
 if ENABLE_STRICT_HEADERS
 check-headers:
-	@echo "Checking for forward declarations..."
-	@$(top_srcdir)/scripts/check-forward-declarations.sh $(top_srcdir)
-	@echo "Header validation passed"
+  @echo "Checking for forward declarations..."
+  @$(top_srcdir)/scripts/check-forward-declarations.sh $(top_srcdir)
+  @echo "Header validation passed"
 
 all-local: check-headers
 endif
@@ -352,14 +352,14 @@ The `scripts/check-forward-declarations.sh` script MUST:
 
 1. **Scan all source files** (`.c` and `.h`) for forward declarations
 2. **Identify prohibited patterns**:
-   - `struct name;` declarations
-   - Function declarations that exist in headers
-   - Type declarations that duplicate header definitions
+  - `struct name;` declarations
+  - Function declarations that exist in headers
+  - Type declarations that duplicate header definitions
 3. **Cross-reference with headers** to detect duplicates
 4. **Generate clear error messages** indicating:
-   - Which file contains the forward declaration
-   - Which header should be included instead
-   - Line number and context of the violation
+  - Which file contains the forward declaration
+  - Which header should be included instead
+  - Line number and context of the violation
 5. **Return non-zero exit code** to fail the build when violations are found
 
 #### Error Message Format
@@ -367,7 +367,7 @@ The `scripts/check-forward-declarations.sh` script MUST:
 ERROR: Forward declaration found in kernel/memory.c:15
   Found: struct process_s;
   Solution: #include "process.h"
-  
+
 ERROR: Duplicate function declaration in tests/test_memory.c:23
   Found: int memory_init(void);
   Solution: #include "memory.h"
@@ -377,11 +377,11 @@ ERROR: Duplicate function declaration in tests/test_memory.c:23
 ```makefile
 # Ensure header validation runs in continuous integration
 check: check-headers
-	@echo "All code quality checks passed"
+  @echo "All code quality checks passed"
 
 # Make header validation mandatory for release builds
 dist-hook: check-headers
-	@echo "Distribution package validated"
+  @echo "Distribution package validated"
 ```
 
 ### Header Dependency Validation

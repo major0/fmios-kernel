@@ -346,7 +346,7 @@ Do NOT use the `k` prefix for kernel-specific types and functions that have no s
 ```c
 // CORRECT: No conflicts with standard library
 typedef struct kobj_s kobj_t;          // No standard equivalent
-typedef struct spinlock_s spinlock_t;  // No standard equivalent  
+typedef struct spinlock_s spinlock_t;  // No standard equivalent
 typedef struct list_s list_t;          // No standard equivalent
 typedef struct btree_s btree_t;        // No standard equivalent
 
@@ -413,7 +413,7 @@ The kernel MUST use compiler-provided standard library functions for basic opera
 
 // Memory operations (REQUIRED)
 memset(ptr, 0, size);                    // Use standard memset
-memcpy(dest, src, size);                 // Use standard memcpy  
+memcpy(dest, src, size);                 // Use standard memcpy
 memcmp(ptr1, ptr2, size);                // Use standard memcmp
 memmove(dest, src, size);                // Use standard memmove
 
