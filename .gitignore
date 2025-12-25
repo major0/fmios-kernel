@@ -15,6 +15,7 @@ build/
 dist/
 *.log
 .deps
+*.iso
 
 # Temporary files
 *.tmp

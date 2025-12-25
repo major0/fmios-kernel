@@ -84,8 +84,20 @@ if test "x$QEMU" = "x"; then
 	AC_MSG_WARN([qemu-system-x86_64 not found - QEMU testing will not be available])
 fi
 
-# Conditional for QEMU availability
+# Check for GRUB tools for Multiboot2 ISO generation
+AC_CHECK_PROG([GRUB_MKRESCUE], [grub-mkrescue], [grub-mkrescue])
+if test "x$GRUB_MKRESCUE" = "x"; then
+	AC_MSG_WARN([grub-mkrescue not found - ISO generation will not be available])
+fi
+
+AC_CHECK_PROG([XORRISO], [xorriso], [xorriso])
+if test "x$XORRISO" = "x"; then
+	AC_MSG_WARN([xorriso not found - ISO generation may not work properly])
+fi
+
+# Conditional for QEMU and GRUB availability
 AM_CONDITIONAL([HAVE_QEMU], [test "x$QEMU" != "x"])
+AM_CONDITIONAL([HAVE_GRUB], [test "x$GRUB_MKRESCUE" != "x"])
 
 # Output files
 AC_CONFIG_FILES([
@@ -108,4 +120,6 @@ FMI/OS Stage 1 Build Configuration:
 	Kernel CFLAGS: $KERNEL_CFLAGS
 	Kernel LDFLAGS: $KERNEL_LDFLAGS
 	QEMU Available: ${QEMU:-no}
+	GRUB Available: ${GRUB_MKRESCUE:-no}
+	XORRISO Available: ${XORRISO:-no}
 ])

@@ -8,7 +8,7 @@ The Bootstrap subsystem handles the critical early kernel initialization phase, 
 
 - **Bootstrap**: The early kernel initialization code that sets up the execution environment
 - **Multiboot_Protocol**: Standard boot protocol used by GRUB and other bootloaders
-- **PVH_ELF**: Paravirtualized Hardware ELF boot protocol for virtualization environments
+- **GRUB**: Grand Unified Bootloader that implements Multiboot v2 protocol
 - **Mode_Transition**: The process of switching from 32-bit to 64-bit execution mode
 - **Boot_Protocol_Detection**: Mechanism to identify which bootloader protocol was used
 - **Memory_Detection**: Process of discovering available system memory from bootloader
@@ -22,14 +22,14 @@ The Bootstrap subsystem handles the critical early kernel initialization phase, 
 
 #### Acceptance Criteria
 
-1. THE Bootstrap SHALL support Multiboot v2 protocol for x86_64 architecture
-2. THE Bootstrap SHALL support PVH ELF boot protocol for virtualization environments
+1. THE Bootstrap SHALL support Multiboot v2 protocol for x86_64 architecture via GRUB bootloader
+2. THE Bootstrap SHALL support UEFI boot protocol for modern hardware platforms
 3. THE Bootstrap SHALL support U-Boot protocol for ARM64 and RISC-V architectures
-4. THE Bootstrap SHALL support UEFI boot protocol for modern hardware platforms
-5. THE Bootstrap SHALL detect which boot protocol was used during startup
-6. THE Bootstrap SHALL expose detected boot protocol through `//kern/boot/protocol` in the KFS
-7. THE Build_System SHALL enforce architecture-specific boot protocol restrictions
-8. WHEN building for ARM64 or RISC-V, THE Build_System SHALL require U-Boot or UEFI protocol support
+4. THE Bootstrap SHALL detect which boot protocol was used during startup
+5. THE Bootstrap SHALL expose detected boot protocol through `//kern/boot/protocol` in the KFS
+6. THE Build_System SHALL enforce architecture-specific boot protocol restrictions
+7. WHEN building for ARM64 or RISC-V, THE Build_System SHALL require U-Boot or UEFI protocol support
+8. THE x86_64 Bootstrap SHALL use GRUB as the primary bootloader for Multiboot v2 protocol compliance
 
 ### Requirement 2: 32-bit to 64-bit Mode Transition
 
@@ -89,8 +89,8 @@ The Bootstrap subsystem handles the critical early kernel initialization phase, 
 #### Acceptance Criteria
 
 1. THE Bootstrap SHALL be located in `arch/*/bootstrap.S` for each architecture
-2. THE x86_64 Bootstrap SHALL handle Multiboot v2 and PVH ELF protocols
-3. THE x86_64 Bootstrap SHALL support both 32-bit and 64-bit entry points for these protocols
+2. THE x86_64 Bootstrap SHALL handle Multiboot v2 protocol via GRUB bootloader
+3. THE x86_64 Bootstrap SHALL support 32-bit entry point from GRUB and transition to 64-bit mode
 4. THE ARM64 Bootstrap SHALL handle U-Boot and UEFI protocols
 5. THE RISC-V Bootstrap SHALL handle U-Boot and UEFI protocols
 6. THE Bootstrap SHALL call generic kernel main entry point after initialization
@@ -109,7 +109,7 @@ The Bootstrap subsystem handles the critical early kernel initialization phase, 
 2. THE Minimalized_Kernel SHALL use simplified console output via arch_putchar() function
 3. THE Minimalized_Kernel SHALL display detected CPU type and architecture information
 4. THE Minimalized_Kernel SHALL display total memory detected from bootloader
-5. THE Minimalized_Kernel SHALL display boot protocol used (Multiboot v2, PVH, U-Boot, UEFI)
+5. THE Minimalized_Kernel SHALL display boot protocol used (Multiboot v2, U-Boot, UEFI)
 6. THE Minimalized_Kernel SHALL display command line parameters received from bootloader
 7. THE Minimalized_Kernel SHALL work with all architecture-specific bootstrap code
 8. THE Minimalized_Kernel SHALL output information to serial console for automated capture

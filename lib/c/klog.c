@@ -40,7 +40,7 @@ int klogf(klog_level_t level, const char *format, ...)
 
 	/* Print the actual message */
 	va_start(args, format);
-	result = kprintf(format, args);
+	result = kvprintf(format, args);
 	va_end(args);
 
 	return result;

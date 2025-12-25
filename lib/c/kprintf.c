@@ -41,13 +41,22 @@ static void serial_puts(const char *str)
 int kprintf(const char *format, ...)
 {
 	va_list args;
-	char buffer[1024];
 	int result;
 
 	va_start(args, format);
-	result = kvsnprintf(buffer, sizeof(buffer), format, args);
+	result = kvprintf(format, args);
 	va_end(args);
 
+	return result;
+}
+
+/* Printf with va_list for Stage 1 */
+int kvprintf(const char *format, va_list args)
+{
+	char buffer[1024];
+	int result;
+
+	result = kvsnprintf(buffer, sizeof(buffer), format, args);
 	serial_puts(buffer);
 	return result;
 }

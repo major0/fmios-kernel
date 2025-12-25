@@ -5,11 +5,10 @@
 This implementation plan follows the incremental development approach, building bootstrap functionality stage by stage. Each stage produces a working, testable kernel that boots and demonstrates implemented features.
 
 **INCREMENTAL APPROACH**:
-- Stage 1: Minimal x86_64 PVH ELF bootstrap (Hello World)
-- Stage 2: Add Multiboot2 support to x86_64
-- Stage 3: Add UEFI support to x86_64
-- Stage 5: ARM64 bootstrap (U-Boot + UEFI)
-- Stage 6: RISC-V bootstrap (U-Boot + UEFI)
+- Stage 1: Minimal x86_64 Multiboot2 bootstrap with GRUB (Hello World)
+- Stage 2: Add UEFI support to x86_64
+- Stage 3: ARM64 bootstrap (U-Boot + UEFI)
+- Stage 4: RISC-V bootstrap (U-Boot + UEFI)
 
 ## Tasks
 
@@ -25,7 +24,7 @@ Remove all Multiboot v1 support from the entire codebase, including build system
 - Remove multiboot1-related conditional compilation from Makefiles
 - Remove multiboot1 entries from GRUB configuration generation scripts
 - Update configure script help text to remove multiboot1 references
-- Ensure Multiboot v2 and PVH ELF remain available for x86_64 targets
+- Ensure Multiboot v2 remains available for x86_64 targets with GRUB bootloader
 - Test configure script with various architecture and protocol combinations
 
 **Phase 2: Assembly Code Cleanup** ✅ COMPLETED
@@ -39,7 +38,7 @@ Remove all Multiboot v1 support from the entire codebase, including build system
 **Phase 3: Documentation Cleanup** ✅ COMPLETED
 - Update build system documentation to reflect multiboot1 removal
 - Remove multiboot1 references from all documentation files
-- Update architecture documentation to focus on Multiboot v2 and PVH ELF only
+- Update architecture documentation to focus on Multiboot v2 with GRUB bootloader
 - _Requirements: 1.7, 1.8, 1.1, 1.5, 1.6_
 
 - [x] 1.1 Verify multiboot1 removal completeness
@@ -62,7 +61,6 @@ Simplify the existing kernel to create a minimal bootstrap validation environmen
 
 **Phase 2: Implement Boot-Mode Specific Main Functions**
 - Create mb2_main() for Multiboot v2 specific initialization
-- Create pvh_main() for PVH ELF specific initialization
 - Create uefi_main() for UEFI specific initialization
 - Create uboot_main() for U-Boot specific initialization
 - Each boot-mode main handles protocol-specific setup before calling kmain()
@@ -88,35 +86,33 @@ Simplify the existing kernel to create a minimal bootstrap validation environmen
 
 - [ ]* 2.2 Write automated test validation scripts
 
-- [ ] 3. Implement Simplified x86_64 Bootstrap with 32-bit Mode Assumption
+- [ ] 3. Implement x86_64 Multiboot2 Bootstrap with GRUB
 **Priority: HIGH - Core x86_64 boot protocol correctness**
 **Dependencies: Task 2 (simplified kernel infrastructure)**
 
-Implement simplified x86_64 bootstrap code that assumes 32-bit mode entry for all boot protocols and provides clean separation between boot-mode specific setup.
+Implement x86_64 bootstrap code for Multiboot2 protocol using GRUB bootloader, providing reliable 32-bit to 64-bit mode transition.
 
-**Phase 1: Simplified Bootstrap Assembly**
-- Create minimalized bootstrap.S that handles bare minimum needed in assembly
-- Assume Multiboot v2 always starts in 32-bit mode with proper header in code32 segment
-- Assume PVH ELF always starts in 32-bit mode
-- Handle UEFI 64-bit entry separately
-- Implement 32-bit to 64-bit mode transition for Multiboot v2 and PVH
-- Each boot mode jumps to its specific main function (mb2_main, pvh_main, uefi_main)
-- Remove complex protocol detection from assembly code
+**Phase 1: Multiboot2 Bootstrap Assembly**
+- Create bootstrap.S that handles Multiboot2 protocol with proper header
+- Implement Multiboot2 header with required tags for GRUB compatibility
+- Handle 32-bit entry point from GRUB bootloader
+- Implement 32-bit to 64-bit mode transition for Multiboot2
+- Jump to mb2_main() function with Multiboot2 information structure
+- Remove PVH ELF support and focus solely on Multiboot2
 
-**Phase 2: Boot-Mode Specific Jump Targets**
-- Multiboot v2 entry: 32-bit mode → 64-bit transition → mb2_main(magic, info)
-- PVH ELF entry: 32-bit mode → 64-bit transition → pvh_main(start_info)
-- UEFI entry: 64-bit mode → uefi_main(system_table)
-- Each jump target receives boot-protocol specific parameters
-- Clean separation between assembly bootstrap and C initialization code
-
-**Phase 3: Mode Transition Implementation**
+**Phase 2: Mode Transition Implementation**
 - Implement CPU feature detection (CPUID, long mode, PAE support)
 - Create minimal page table structure (PML4→PDP→PD with 2MB pages)
 - Set up temporary GDT with 64-bit code and data segments
 - Enable PAE, long mode, and paging in proper sequence
 - Perform far jump to 64-bit code segment
 - Validate successful 64-bit mode operation
+
+**Phase 3: GRUB Integration and Testing**
+- Create ISO image with GRUB bootloader for QEMU testing
+- Test Multiboot2 boot using GRUB in QEMU environment
+- Validate Multiboot2 information structure parsing
+- Ensure proper memory map and command line parameter extraction
 - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10_
 
 - [ ]* 3.1 Write property test for mode transition atomicity
@@ -124,50 +120,13 @@ Implement simplified x86_64 bootstrap code that assumes 32-bit mode entry for al
   - **Validates: Requirements 2.9, 2.10**
 
 - [ ]* 3.2 Write unit tests for Multiboot v2 mode detection
-  - Test mode detection logic for 32-bit vs 64-bit entry
-  - Test conditional transition behavior
+  - Test mode detection logic for 32-bit entry from GRUB
+  - Test Multiboot2 information structure parsing
   - _Requirements: 2.3_
 
-- [ ] 4. Implement and Validate PVH ELF 32-bit to 64-bit Mode Transition
-**Priority: HIGH - Virtualization boot protocol correctness**
-**Dependencies: Task 3 (Multiboot v2 implementation for shared transition code)**
-
-Implement and validate PVH ELF boot protocol with proper 32-bit to 64-bit mode transition, tested using the simplified kernel.
-
-**Phase 1: PVH ELF Protocol Implementation**
-- Generate proper ELF64 executable with PVH-compatible entry points
-- Add XEN_ELFNOTE_PHYS32_ENTRY and XEN_ELFNOTE_ENTRY notes
-- Implement 32-bit entry point for PVH ELF protocol (PVH always boots into 32-bit mode)
-- Add PVH start info structure detection and parsing
-- Implement memory map extraction from PVH start info
-- Add command line parameter parsing from PVH start info
-
-**Phase 2: Mode Transition for PVH**
-- Implement 32-bit to 64-bit mode transition for PVH 32-bit entry (reusing Multiboot v2 transition code)
-- Add 64-bit mode validation after transition
-- Ensure mode transition code works for both PVH ELF and Multiboot v2
-- Add PVH-specific debug output and error handling
-
-**Phase 3: Testing with Simplified Kernel**
-- Test PVH boot in QEMU virtualization environment using simplified kernel
-- Validate PVH-specific boot information exposure
-- Add Xen hypervisor and QEMU PVH compatibility testing
-- Validate that standardized boot_info_t structure is properly populated from PVH data
-- _Requirements: 1.2, 1.5, 1.6_
-
-- [ ]* 4.1 Write unit tests for PVH ELF support
-  - Test PVH start info structure parsing
-  - Test 32-bit entry point and mode transition functionality
-  - _Requirements: 1.2_
-
-- [ ]* 4.2 Write QEMU integration tests for PVH boot scenarios
-  - Test PVH boot in QEMU virtualization environment
-  - Validate PVH-specific boot information exposure
-  - _Requirements: 1.2_
-
-- [ ] 5. Implement and Validate UEFI Boot Protocol Support
+- [ ] 4. Implement and Validate UEFI Boot Protocol Support
 **Priority: HIGH - Modern firmware boot protocol correctness**
-**Dependencies: Task 4 (PVH ELF implementation)**
+**Dependencies: Task 3 (Multiboot v2 implementation)**
 
 Implement UEFI boot protocol support for modern firmware environments, tested using the simplified kernel.
 
@@ -191,19 +150,19 @@ Implement UEFI boot protocol support for modern firmware environments, tested us
 - Validate that standardized boot_info_t structure is properly populated from UEFI data
 - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3_
 
-- [ ]* 5.1 Write unit tests for UEFI support
+- [ ]* 4.1 Write unit tests for UEFI support
   - Test UEFI memory map parsing
   - Test UEFI command line parameter extraction
   - _Requirements: 3.1, 3.2, 4.1, 4.2_
 
-- [ ]* 5.2 Write QEMU UEFI integration tests
+- [ ]* 4.2 Write QEMU UEFI integration tests
   - Test UEFI boot in QEMU with OVMF firmware
   - Validate UEFI-specific boot information
   - _Requirements: 3.3, 3.4, 4.3_
 
-- [ ] 6. Implement ARM64 Bootstrap Code
+- [ ] 5. Implement ARM64 Bootstrap Code
 **Priority: HIGH - ARM64 architecture support**
-**Dependencies: Task 5 (UEFI implementation for shared code)**
+**Dependencies: Task 4 (UEFI implementation for shared code)**
 
 Implement ARM64 bootstrap code with U-Boot and UEFI protocol support, tested using the simplified kernel.
 
@@ -228,17 +187,17 @@ Implement ARM64 bootstrap code with U-Boot and UEFI protocol support, tested usi
 - Ensure consistent behavior with x86_64 architecture
 - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10_
 
-- [ ]* 6.1 Write property test for ARM64 bootstrap correctness
+- [ ]* 5.1 Write property test for ARM64 bootstrap correctness
   - **Property 6: Architecture-Specific Bootstrap Correctness**
   - **Validates: Requirements 5.5, 5.6**
 
-- [ ]* 6.2 Write unit tests for ARM64 CPU feature detection
+- [ ]* 5.2 Write unit tests for ARM64 CPU feature detection
   - **Property 5: CPU Feature Detection Reliability**
   - **Validates: Requirements 5.1, 5.2**
 
-- [ ] 7. Implement RISC-V Bootstrap Code
+- [ ] 6. Implement RISC-V Bootstrap Code
 **Priority: HIGH - RISC-V architecture support**
-**Dependencies: Task 6 (ARM64 implementation for shared patterns)**
+**Dependencies: Task 5 (ARM64 implementation for shared patterns)**
 
 Implement RISC-V bootstrap code with U-Boot and UEFI protocol support, tested using the simplified kernel.
 
@@ -263,17 +222,17 @@ Implement RISC-V bootstrap code with U-Boot and UEFI protocol support, tested us
 - Ensure consistent behavior across all architectures (x86_64, ARM64, RISC-V)
 - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10_
 
-- [ ]* 7.1 Write property test for RISC-V bootstrap correctness
+- [ ]* 6.1 Write property test for RISC-V bootstrap correctness
   - **Property 6: Architecture-Specific Bootstrap Correctness**
   - **Validates: Requirements 5.5, 5.6**
 
-- [ ]* 7.2 Write unit tests for RISC-V CPU feature detection
+- [ ]* 6.2 Write unit tests for RISC-V CPU feature detection
   - **Property 5: CPU Feature Detection Reliability**
   - **Validates: Requirements 5.1, 5.2**
 
-- [ ] 8. Implement Unified Memory Detection and Command Line Systems
+- [ ] 7. Implement Unified Memory Detection and Command Line Systems
 **Priority: MEDIUM - Supporting infrastructure for all architectures**
-**Dependencies: Task 7 (RISC-V implementation)**
+**Dependencies: Task 6 (RISC-V implementation)**
 
 Implement bootloader-agnostic memory detection and command line parameter systems that work across all architectures, tested using the simplified kernel.
 
@@ -306,30 +265,29 @@ Implement bootloader-agnostic memory detection and command line parameter system
 - Ensure consistent behavior across all supported combinations
 - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.10_
 
-- [ ]* 8.1 Write property test for memory map consistency
+- [ ]* 7.1 Write property test for memory map consistency
   - **Property 3: Memory Map Consistency**
   - **Validates: Requirements 3.5, 3.6**
 
-- [ ]* 8.2 Write property test for command line parameter preservation
+- [ ]* 7.2 Write property test for command line parameter preservation
   - **Property 4: Command Line Parameter Preservation**
   - **Validates: Requirements 4.4, 4.5**
 
-- [ ]* 8.3 Write unit tests for memory detection and command line parsing
+- [ ]* 7.3 Write unit tests for memory detection and command line parsing
   - Test memory detection for all bootloader types
   - Test command line parameter parsing for all bootloader types
   - Test key=value pairs and boolean flag parsing
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3_
 
-- [ ] 9. Implement Boot Information Exposure System
+- [ ] 8. Implement Boot Information Exposure System
 **Priority: MEDIUM - System introspection support**
-**Dependencies: Task 8 (unified memory and command line systems)**
+**Dependencies: Task 7 (unified memory and command line systems)**
 
 Implement boot information exposure through the KFS interface, providing unified access to boot information across all architectures.
 
 **Phase 1: KFS Interface Implementation**
 - Expose boot protocol information via `//kern/boot/protocol`
 - Expose multiboot v2 information via `//kern/boot/multiboot_info` (x86_64 only)
-- Expose PVH information via `//kern/boot/pvh_info` (x86_64 only)
 - Expose UEFI information via `//kern/boot/uefi_info` (all architectures)
 - Expose U-Boot information via `//kern/boot/uboot_info` (ARM64, RISC-V)
 - Expose memory map via `//kern/boot/memory_map` (all architectures)
@@ -350,23 +308,23 @@ Implement boot information exposure through the KFS interface, providing unified
 - Ensure boot information persists throughout kernel lifetime
 - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9, 6.10_
 
-- [ ]* 9.1 Write property test for boot information exposure consistency
+- [ ]* 8.1 Write property test for boot information exposure consistency
   - **Property 7: Boot Information Exposure Consistency**
   - **Validates: Requirements 6.1, 6.9**
 
-- [ ]* 9.2 Write unit tests for KFS boot information interface
+- [ ]* 8.2 Write unit tests for KFS boot information interface
   - Test boot information formatting and access
   - Test atomic updates and consistency
   - _Requirements: 6.7, 6.8, 6.9, 6.10_
 
-- [ ] 10. Final Integration Testing and Validation
+- [ ] 9. Final Integration Testing and Validation
 **Priority: HIGH - Comprehensive system validation**
-**Dependencies: Task 9 (boot information exposure)**
+**Dependencies: Task 8 (boot information exposure)**
 
 Perform comprehensive integration testing across all architectures and boot protocols using the simplified kernel.
 
 **Phase 1: Cross-Architecture Validation**
-- Test all boot protocols on x86_64 (Multiboot v2, PVH ELF, UEFI) using simplified kernel
+- Test all boot protocols on x86_64 (Multiboot v2, UEFI) using simplified kernel
 - Test all boot protocols on ARM64 (U-Boot, UEFI) using simplified kernel
 - Test all boot protocols on RISC-V (U-Boot, UEFI) using simplified kernel
 - Validate consistent behavior across all architecture/protocol combinations
@@ -386,12 +344,12 @@ Perform comprehensive integration testing across all architectures and boot prot
 - Ensure clean shutdown and resource cleanup
 - _Requirements: All bootstrap requirements across all architectures_
 
-- [ ]* 10.1 Write comprehensive integration tests
+- [ ]* 9.1 Write comprehensive integration tests
   - Test all architecture/protocol combinations
   - Validate cross-architecture consistency
   - _Requirements: All bootstrap requirements_
 
-- [ ] 11. Checkpoint - Ensure all tests pass
+- [ ] 10. Checkpoint - Ensure all tests pass
 Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
