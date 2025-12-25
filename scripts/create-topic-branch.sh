@@ -138,38 +138,21 @@ if [ -n "$TASK_REF" ]; then
     validate_task_reference "$TASK_REF" || true
 fi
 
-# Ensure we're on main/master before creating branch
-current_branch=$(git branch --show-current)
-if [ "$current_branch" != "main" ] && [ "$current_branch" != "master" ]; then
-    echo -e "${YELLOW}⚠️  Currently on branch '$current_branch'${NC}"
-    echo -e "${BLUE}Switching to main branch before creating topic branch...${NC}"
-    
-    # Check for uncommitted changes
-    if ! git diff-index --quiet HEAD --; then
-        echo -e "${RED}❌ You have uncommitted changes. Please commit or stash them first.${NC}"
-        exit 1
-    fi
-    
-    # Switch to main (or master if main doesn't exist)
-    if git show-ref --verify --quiet refs/heads/main; then
-        git checkout main
-    elif git show-ref --verify --quiet refs/heads/master; then
-        git checkout master
-    else
-        echo -e "${RED}❌ Neither 'main' nor 'master' branch found${NC}"
-        exit 1
-    fi
+# Check for uncommitted changes in current branch
+if ! git diff-index --quiet HEAD --; then
+    echo -e "${RED}❌ You have uncommitted changes. Please commit or stash them first.${NC}"
+    exit 1
 fi
-
-# Pull latest changes
-echo -e "${BLUE}Pulling latest changes...${NC}"
-git pull origin "$(git branch --show-current)" || {
-    echo -e "${YELLOW}⚠️  Could not pull latest changes. Continuing with local state.${NC}"
-}
 
 # Create and checkout the new branch with upstream tracking
 echo -e "${GREEN}Creating topic branch: $FULL_BRANCH_NAME${NC}"
 git checkout -b "$FULL_BRANCH_NAME" origin/main
+
+# Pull latest changes to ensure branch is up-to-date
+echo -e "${BLUE}Pulling latest changes...${NC}"
+git pull || {
+    echo -e "${YELLOW}⚠️  Could not pull latest changes. Continuing with current state.${NC}"
+}
 
 # Branch is now tracking origin/main as upstream
 echo -e "${BLUE}Branch '$FULL_BRANCH_NAME' created successfully with upstream tracking!${NC}"
