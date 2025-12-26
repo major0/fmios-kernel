@@ -46,3 +46,10 @@ test_iso_properties
 # Kernel binary
 fmi-kernel
 kernel/fmios-kernel
+kernel/fmi-kernel
+
+# Additional build artifacts
+*_a-*.o
+lib*_a-*.o
+*-kernel
+build-aux/test-driver
