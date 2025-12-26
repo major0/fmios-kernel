@@ -25,8 +25,11 @@
 #include <string.h>
 
 /* Global boot information structure */
+#if defined(ENABLE_MULTIBOOT2) || defined(ENABLE_UEFI)
 static boot_info_t global_boot_info;
+#endif
 
+#ifdef ENABLE_MULTIBOOT2
 /* Multiboot2 main function - called from bootstrap.S */
 void mb2_main(uint32_t magic, uint64_t multiboot_info_addr)
 {
@@ -52,7 +55,9 @@ void mb2_main(uint32_t magic, uint64_t multiboot_info_addr)
 	/* Call kernel main with boot information */
 	kmain(&global_boot_info);
 }
+#endif /* ENABLE_MULTIBOOT2 */
 
+#ifdef ENABLE_UEFI
 /* UEFI main function - called from UEFI entry point */
 void uefi_main(uint64_t image_handle, uint64_t system_table)
 {
@@ -78,7 +83,9 @@ void uefi_main(uint64_t image_handle, uint64_t system_table)
 	/* Call kernel main with boot information */
 	kmain(&global_boot_info);
 }
+#endif /* ENABLE_UEFI */
 
+#ifdef ENABLE_MULTIBOOT2
 /* Parse Multiboot2 information structure */
 int parse_multiboot2_info(uint64_t multiboot_info_addr, boot_info_t *boot_info)
 {
@@ -103,7 +110,9 @@ int parse_multiboot2_info(uint64_t multiboot_info_addr, boot_info_t *boot_info)
 
 	return 0; /* Success */
 }
+#endif /* ENABLE_MULTIBOOT2 */
 
+#ifdef ENABLE_UEFI
 /* Parse UEFI information structure */
 int parse_uefi_info(uint64_t image_handle, uint64_t system_table, boot_info_t *boot_info)
 {
@@ -129,6 +138,7 @@ int parse_uefi_info(uint64_t image_handle, uint64_t system_table, boot_info_t *b
 
 	return 0; /* Success */
 }
+#endif /* ENABLE_UEFI */
 
 /* Check if a memory region is usable */
 int memory_region_is_usable(const memory_region_t *region)

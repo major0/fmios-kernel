@@ -22,6 +22,17 @@ AC_ARG_WITH([target],
 	[target_arch=$withval],
 	[target_arch=x86_64])
 
+# Boot protocol selection
+AC_ARG_ENABLE([multiboot2],
+	[AS_HELP_STRING([--enable-multiboot2], [Enable Multiboot2 support (default: yes)])],
+	[enable_multiboot2=$enableval],
+	[enable_multiboot2=yes])
+
+AC_ARG_ENABLE([uefi],
+	[AS_HELP_STRING([--enable-uefi], [Enable UEFI support (default: yes)])],
+	[enable_uefi=$enableval],
+	[enable_uefi=yes])
+
 # Validate target architecture - Stage 1 only supports x86_64
 case "$target_arch" in
 	x86_64)
@@ -32,6 +43,24 @@ case "$target_arch" in
 		;;
 esac
 
+# Validate boot protocol selection
+if test "x$enable_multiboot2" = "xno" && test "x$enable_uefi" = "xno"; then
+	AC_MSG_ERROR([At least one boot protocol must be enabled])
+fi
+
+# Log boot protocol selection (preprocessor definitions added later)
+if test "x$enable_multiboot2" = "xyes"; then
+	AC_MSG_NOTICE([Multiboot2 support: enabled])
+else
+	AC_MSG_NOTICE([Multiboot2 support: disabled])
+fi
+
+if test "x$enable_uefi" = "xyes"; then
+	AC_MSG_NOTICE([UEFI support: enabled])
+else
+	AC_MSG_NOTICE([UEFI support: disabled])
+fi
+
 # Set architecture-specific compiler flags for x86_64 (Stage 1: simplified)
 ARCH_CFLAGS="-mno-red-zone -mno-mmx -mno-sse -mno-sse2"
 ARCH_LDFLAGS="-z max-page-size=0x1000"
@@ -40,6 +69,15 @@ ARCH_LDFLAGS="-z max-page-size=0x1000"
 KERNEL_CFLAGS="-std=c11 -Wall -Wextra -Werror -ffreestanding"
 KERNEL_CFLAGS="$KERNEL_CFLAGS -nostdlib -fno-builtin"
 KERNEL_CFLAGS="$KERNEL_CFLAGS $ARCH_CFLAGS"
+
+# Add preprocessor definitions for boot protocols (after base flags are set)
+if test "x$enable_multiboot2" = "xyes"; then
+	KERNEL_CFLAGS="$KERNEL_CFLAGS -DENABLE_MULTIBOOT2=1"
+fi
+
+if test "x$enable_uefi" = "xyes"; then
+	KERNEL_CFLAGS="$KERNEL_CFLAGS -DENABLE_UEFI=1"
+fi
 
 # Check for compiler support for security mitigations (disabled for Stage 1)
 # AC_MSG_CHECKING([for compiler support of retpoline])
@@ -98,6 +136,8 @@ fi
 # Conditional for QEMU and GRUB availability
 AM_CONDITIONAL([HAVE_QEMU], [test "x$QEMU" != "x"])
 AM_CONDITIONAL([HAVE_GRUB], [test "x$GRUB_MKRESCUE" != "x"])
+AM_CONDITIONAL([ENABLE_MULTIBOOT2], [test "x$enable_multiboot2" = "xyes"])
+AM_CONDITIONAL([ENABLE_UEFI], [test "x$enable_uefi" = "xyes"])
 
 # Output files
 AC_CONFIG_FILES([
@@ -117,6 +157,8 @@ AC_OUTPUT
 AC_MSG_NOTICE([
 FMI/OS Stage 1 Build Configuration:
 	Target Architecture: $target_arch
+	Multiboot2 Support: ${enable_multiboot2}
+	UEFI Support: ${enable_uefi}
 	Kernel CFLAGS: $KERNEL_CFLAGS
 	Kernel LDFLAGS: $KERNEL_LDFLAGS
 	QEMU Available: ${QEMU:-no}

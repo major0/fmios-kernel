@@ -33,12 +33,12 @@ void arch_init(void)
 	/* Stage 1: Basic architecture initialization */
 
 	/* Debug: arch_init entry */
-	__asm__ volatile("movb $'1', %%al; outb %%al, $0x3f8" ::: "al");
+	__asm__ volatile("movb $'1', %%al; outb %%al, %0" ::"Nd"(0x3f8) : "al");
 
 	klogf(KLOG_INFO, "x86_64 architecture initialized");
 
 	/* Debug: arch_init complete */
-	__asm__ volatile("movb $'2', %%al; outb %%al, $0x3f8" ::: "al");
+	__asm__ volatile("movb $'2', %%al; outb %%al, %0" ::"Nd"(0x3f8) : "al");
 }
 
 void arch_halt(void)
