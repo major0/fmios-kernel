@@ -5,6 +5,7 @@
  */
 
 /* Multiboot2 Header for GRUB bootloader */
+#ifdef ENABLE_MULTIBOOT2
 .section .multiboot2, "a", @progbits
 .align 8
 multiboot2_header:
@@ -19,10 +20,13 @@ multiboot2_header:
 	.short 0                        /* Flags: none */
 	.long 8                         /* Size: 8 bytes */
 multiboot2_header_end:
+#endif /* ENABLE_MULTIBOOT2 */
 
 /* 32-bit code section for Multiboot2 entry */
 .section .text, "ax", @progbits
 .code32
+
+#ifdef ENABLE_MULTIBOOT2
 .global _start
 .type _start, @function
 
@@ -207,6 +211,8 @@ halt_here:
 	/* Infinite loop for debugging */
 	jmp halt_here
 
+#endif /* ENABLE_MULTIBOOT2 */
+
 /* 64-bit code section */
 .section .text
 .code64
@@ -259,6 +265,7 @@ _start64:
 	movb $'S', %al                 /* 'S' = arch_early_init done */
 	outb %al, %dx
 
+#ifdef ENABLE_MULTIBOOT2
 	/* Prepare arguments for mb2_main */
 	/* RDI = magic number (should be 0x36d76289 for Multiboot2) */
 	/* RSI = multiboot info address (passed from GRUB in EBX) */
@@ -267,6 +274,13 @@ _start64:
 
 	/* Call Multiboot2 main function */
 	call mb2_main
+#else
+	/* No Multiboot2 support - this should not be reached */
+	/* Debug: Multiboot2 disabled but _start64 called */
+	movb $'E', %al                 /* 'E' = error - Multiboot2 disabled */
+	outb %al, %dx
+	call arch_halt
+#endif
 
 	/* Debug: kmain returned (should not happen) */
 	movb $'U', %al                 /* 'U' = kmain returned */
@@ -298,6 +312,7 @@ kernel_stack_top:
 /* UEFI entry point - called directly by UEFI firmware */
 .section .text
 .code64
+#ifdef ENABLE_UEFI
 .global _start_uefi
 .type _start_uefi, @function
 
@@ -353,3 +368,5 @@ _start_uefi:
 
 	/* If uefi_main returns, halt the system */
 	call arch_halt
+
+#endif /* ENABLE_UEFI */

@@ -156,18 +156,28 @@ typedef struct efi_memory_descriptor_s efi_memory_descriptor_t;
 
 /* Boot entry points */
 extern void _start(void);
+#ifdef ENABLE_UEFI
 extern void _start_uefi(void);
+#endif
 
 /* Boot-mode specific main functions */
+#ifdef ENABLE_MULTIBOOT2
 extern void mb2_main(uint32_t magic, uint64_t multiboot_info_addr);
+#endif
+#ifdef ENABLE_UEFI
 extern void uefi_main(uint64_t image_handle, uint64_t system_table);
+#endif
 
 /* Kernel main entry point */
 extern void kmain(boot_info_t *boot_info);
 
 /* Boot information processing functions */
+#ifdef ENABLE_MULTIBOOT2
 extern int parse_multiboot2_info(uint64_t multiboot_info_addr, boot_info_t *boot_info);
+#endif
+#ifdef ENABLE_UEFI
 extern int parse_uefi_info(uint64_t image_handle, uint64_t system_table, boot_info_t *boot_info);
+#endif
 
 /* Memory map utility functions */
 extern int memory_region_is_usable(const memory_region_t *region);
