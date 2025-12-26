@@ -86,7 +86,7 @@ Simplify the existing kernel to create a minimal bootstrap validation environmen
 
 - [ ]* 2.2 Write automated test validation scripts
 
-- [ ] 3. Implement x86_64 Multiboot2 Bootstrap with GRUB
+- [x] 3. Implement x86_64 Multiboot2 Bootstrap with GRUB
 **Priority: HIGH - Core x86_64 boot protocol correctness**
 **Dependencies: Task 2 (simplified kernel infrastructure)**
 
@@ -115,14 +115,7 @@ Implement x86_64 bootstrap code for Multiboot2 protocol using GRUB bootloader, p
 - Ensure proper memory map and command line parameter extraction
 - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10_
 
-- [ ]* 3.1 Write property test for mode transition atomicity
-  - **Property 2: Mode Transition Atomicity**
-  - **Validates: Requirements 2.9, 2.10**
 
-- [ ]* 3.2 Write unit tests for Multiboot v2 mode detection
-  - Test mode detection logic for 32-bit entry from GRUB
-  - Test Multiboot2 information structure parsing
-  - _Requirements: 2.3_
 
 - [ ] 4. Implement and Validate UEFI Boot Protocol Support
 **Priority: HIGH - Modern firmware boot protocol correctness**

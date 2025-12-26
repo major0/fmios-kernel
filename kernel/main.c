@@ -1,6 +1,6 @@
 /*
- * FMI/OS Kernel Main
- * Stage 1: Minimal kernel initialization
+ * FMI/OS Kernel Main Entry Point
+ * Stage 1: Basic kernel entry and initialization
  *
  * Copyright (C) 2024 FMI/OS Project
  *
@@ -20,10 +20,29 @@
  */
 
 #include "arch.h"
+#include "boot.h"
 #include "klibc.h"
 
-/* Stage 1: Minimal kernel main - actual entry is in arch/x86_64/entry.c */
-/* This file exists for future expansion when subsystem initializers are added */
+/* Kernel main entry point called from bootstrap.S */
+void kmain(void)
+{
+	/* Stage 1: Hello World kernel */
 
-/* Future expansion: subsystem initialization will be moved here */
-/* For Stage 1, actual kernel entry is in arch/x86_64/entry.c */
+	/* Initialize architecture */
+	arch_init();
+
+	/* Print hello world message */
+	kprintf("FMI/OS Stage 1 - Hello World Kernel\n");
+
+	klogf(KLOG_INFO, "Architecture: x86_64");
+	klogf(KLOG_INFO, "Boot Protocol: Multiboot2");
+
+	klogf(KLOG_INFO, "Kernel initialization complete");
+
+	klogf(KLOG_INFO, "Stage 1: Basic kernel running");
+
+	/* For Stage 1, just halt after printing messages */
+	kprintf("Stage 1 complete - halting system\n");
+
+	arch_halt();
+}
