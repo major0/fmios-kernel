@@ -36,7 +36,7 @@ Create minimal build system supporting only x86_64 PVH ELF boot for Stage 1.
   - **Property 1: Basic x86_64 Build Functionality**
   - **Validates: Requirements 1.1, 1.2, 1.3**
 
-- [-] 1.2 Fix build system to use fully qualified paths
+- [x] 1.2 Fix build system to use fully qualified paths
 **Priority: CRITICAL BLOCKER - Required to fix property test path resolution**
 **Dependencies: Task 1.1 (property test implementation)**
 
@@ -53,7 +53,7 @@ Update build system to determine fully qualified top-level directory path and ex
 
 ### Stage 2: Multiboot2 Support
 
-- [ ] 2. Add ISO generation and GRUB support for Multiboot2
+- [x] 2. Add ISO generation and GRUB support for Multiboot2
 **Priority: HIGH FUNCTIONALITY - Required for Stage 2 Multiboot2 support**
 **Dependencies: Task 1.2 (fully qualified path support)**
 
@@ -63,12 +63,27 @@ Extend build system to support Multiboot2 boot protocol via ISO generation.
 - Create GRUB configuration generation for Multiboot2
 - Set up proper ELF kernel format for GRUB loading
 - Configure QEMU testing with `-cdrom` flag for ISO images
-- Maintain existing PVH ELF support alongside Multiboot2
-- Add build targets for both PVH ELF and Multiboot2 testing
-- Ensure kernel works with both boot protocols
+- Remove PVH ELF support (abandoned due to QEMU compatibility issues)
+- Add build targets for Multiboot2 testing with GRUB
+- Ensure kernel boots properly via GRUB bootloader
 - _Requirements: 1.4, 8.1, 8.2_
 
-- [ ] 2.1 Write property test for ISO generation
+- [x] 2.1 Fix 32-bit to 64-bit transition in Multiboot2 bootstrap
+**Priority: CRITICAL BLOCKER - Required for proper kernel boot**
+**Dependencies: Task 2 (basic Multiboot2 implementation)**
+
+Fix the bootstrap code to ensure complete 32-bit to 64-bit mode transition.
+
+- Debug output currently shows `1ABCDEFGH6OPQRS` but missing `IJKLMN` steps
+- Missing steps: I=extended CPUID, J=long mode check, K=EFER read, L=long mode enable, M=paging enable, N=GDT load
+- Root cause: Problematic CPUID calls causing system to skip transition steps
+- Fix CPUID detection to work properly in QEMU Multiboot2 environment
+- Ensure all debug steps execute in sequence: `1ABCDEFGHIJKLMN6OPQRS`
+- Validate that 32-bit to 64-bit transition completes all required steps
+- Test with `make clean && make && make qemu-test` to verify fix
+- _Requirements: 1.4, 8.1_
+
+- [x] 2.2 Write property test for ISO generation
   - **Property 2: ISO Generation and Boot Protocol Support**
   - **Validates: Requirements 1.4, 8.1, 8.2**
 
@@ -76,14 +91,14 @@ Extend build system to support Multiboot2 boot protocol via ISO generation.
 
 - [ ] 3. Add UEFI application generation
 **Priority: HIGH FUNCTIONALITY - Required for Stage 3 UEFI support**
-**Dependencies: Task 2 (Multiboot2 support)**
+**Dependencies: Task 2.1 (fixed Multiboot2 bootstrap)**
 
 Extend build system to support UEFI boot protocol.
 
 - Add UEFI application (.efi) generation capabilities
 - Configure UEFI-specific linking and format requirements
 - Set up QEMU testing with OVMF firmware for UEFI boot
-- Maintain support for all three boot protocols (PVH, Multiboot2, UEFI)
+- Maintain support for both Multiboot2 and UEFI boot protocols
 - Add build targets for comprehensive boot protocol testing
 - Ensure consistent kernel behavior across all boot methods
 - _Requirements: 8.3, 8.4, 8.5_
