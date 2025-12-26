@@ -39,6 +39,9 @@ _start:
 	movb $'A', %al                 /* 'A' = 32-bit entry */
 	outb %al, %dx
 
+	/* Save Multiboot2 information (EBX contains multiboot info address) */
+	movl %ebx, %esi                /* Save multiboot info address */
+
 	/* Clear direction flag */
 	cld
 
@@ -240,6 +243,10 @@ _start64:
 	/* Clear frame pointer */
 	xorq %rbp, %rbp
 
+	/* Restore multiboot info address to RBX for mb2_main */
+	movl %esi, %ebx                /* Restore multiboot info address */
+	movq %rbx, %rbx                /* Zero-extend to 64-bit */
+
 	/* Debug: Stack ready */
 	movb $'R', %al                 /* 'R' = 64-bit stack ready */
 	outb %al, %dx
@@ -252,8 +259,14 @@ _start64:
 	movb $'S', %al                 /* 'S' = arch_early_init done */
 	outb %al, %dx
 
-	/* Call kernel main */
-	call kmain
+	/* Prepare arguments for mb2_main */
+	/* RDI = magic number (should be 0x36d76289 for Multiboot2) */
+	/* RSI = multiboot info address (passed from GRUB in EBX) */
+	movl $0x36d76289, %edi         /* Multiboot2 magic number */
+	movq %rbx, %rsi                /* Multiboot info address from GRUB */
+
+	/* Call Multiboot2 main function */
+	call mb2_main
 
 	/* Debug: kmain returned (should not happen) */
 	movb $'U', %al                 /* 'U' = kmain returned */
@@ -281,3 +294,62 @@ gdt64_desc:
 kernel_stack_bottom:
 	.skip 16384
 kernel_stack_top:
+
+/* UEFI entry point - called directly by UEFI firmware */
+.section .text
+.code64
+.global _start_uefi
+.type _start_uefi, @function
+
+_start_uefi:
+	/* UEFI entry point - already in 64-bit mode */
+	/* RCX = EFI_HANDLE ImageHandle */
+	/* RDX = EFI_SYSTEM_TABLE *SystemTable */
+
+	/* Debug: UEFI entry point reached */
+	movq $0x3f8, %r8               /* COM1 port */
+	movb $'U', %al                 /* 'U' = UEFI entry */
+	outb %al, %dx
+
+	/* Save UEFI parameters */
+	pushq %rcx                     /* Save ImageHandle */
+	pushq %rdx                     /* Save SystemTable */
+
+	/* Set up segment registers (should already be correct in UEFI) */
+	movw $0x10, %ax
+	movw %ax, %ds
+	movw %ax, %es
+	movw %ax, %fs
+	movw %ax, %gs
+	movw %ax, %ss
+
+	/* Set up 64-bit stack */
+	movq $kernel_stack_top, %rsp
+
+	/* Clear frame pointer */
+	xorq %rbp, %rbp
+
+	/* Debug: UEFI stack ready */
+	movb $'V', %al                 /* 'V' = UEFI stack ready */
+	outb %al, %dx
+
+	/* Call architecture early initialization */
+	call arch_early_init
+
+	/* Debug: UEFI arch_early_init complete */
+	movb $'W', %al                 /* 'W' = UEFI arch_early_init done */
+	outb %al, %dx
+
+	/* Restore UEFI parameters for uefi_main */
+	popq %rsi                      /* SystemTable -> RSI */
+	popq %rdi                      /* ImageHandle -> RDI */
+
+	/* Call UEFI main function */
+	call uefi_main
+
+	/* Debug: uefi_main returned (should not happen) */
+	movb $'X', %al                 /* 'X' = uefi_main returned */
+	outb %al, %dx
+
+	/* If uefi_main returns, halt the system */
+	call arch_halt

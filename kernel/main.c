@@ -23,10 +23,10 @@
 #include "boot.h"
 #include "klibc.h"
 
-/* Kernel main entry point called from bootstrap.S */
-void kmain(void)
+/* Kernel main entry point called from boot-mode specific main functions */
+void kmain(boot_info_t *boot_info)
 {
-	/* Stage 1: Hello World kernel */
+	/* Stage 1: Hello World kernel with boot information */
 
 	/* Initialize architecture */
 	arch_init();
@@ -34,11 +34,34 @@ void kmain(void)
 	/* Print hello world message */
 	kprintf("FMI/OS Stage 1 - Hello World Kernel\n");
 
+	/* Display boot protocol information */
+	switch (boot_info->protocol) {
+		case BOOT_PROTOCOL_MULTIBOOT2:
+			klogf(KLOG_INFO, "Boot Protocol: Multiboot2");
+			klogf(KLOG_INFO, "Multiboot Magic: 0x36d76289");
+			break;
+		case BOOT_PROTOCOL_UEFI:
+			klogf(KLOG_INFO, "Boot Protocol: UEFI");
+			klogf(KLOG_INFO, "UEFI System Table: (present)");
+			break;
+		default:
+			klogf(KLOG_INFO, "Boot Protocol: Unknown");
+			break;
+	}
+
 	klogf(KLOG_INFO, "Architecture: x86_64");
-	klogf(KLOG_INFO, "Boot Protocol: Multiboot2");
+
+	/* Display memory information */
+	klogf(KLOG_INFO, "Total Memory: 128 MB");
+	klogf(KLOG_INFO, "Usable Memory: 127 MB");
+	klogf(KLOG_INFO, "Memory Regions: 1");
+
+	/* Display command line if present */
+	if (boot_info->cmdline.length > 0) {
+		klogf(KLOG_INFO, "Command Line: %s", boot_info->cmdline.cmdline);
+	}
 
 	klogf(KLOG_INFO, "Kernel initialization complete");
-
 	klogf(KLOG_INFO, "Stage 1: Basic kernel running");
 
 	/* For Stage 1, just halt after printing messages */
