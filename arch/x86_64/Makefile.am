@@ -5,7 +5,8 @@ SUBDIRS = include lib
 
 # Architecture-specific sources for Stage 1
 arch_SOURCES = \
-	bootstrap.S
+	bootstrap.S \
+	boot_main.c
 
 # Build libarch.a for x86_64
 noinst_LIBRARIES = libarch.a
