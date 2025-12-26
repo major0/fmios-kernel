@@ -1,7 +1,7 @@
 # Tests Makefile.am for Stage 1
 
 # Test programs
-check_PROGRAMS = test_build test_build_properties
+check_PROGRAMS = test_build test_build_properties test_iso_properties
 
 # Basic build test
 test_build_SOURCES = test_build.c
@@ -13,8 +13,13 @@ test_build_properties_SOURCES = test_build_properties.c
 test_build_properties_CFLAGS = $(TEST_CFLAGS) -I$(top_srcdir)/include
 test_build_properties_LDADD =
 
+# ISO generation property test
+test_iso_properties_SOURCES = test_iso_properties.c
+test_iso_properties_CFLAGS = $(TEST_CFLAGS) -I$(top_srcdir)/include
+test_iso_properties_LDADD =
+
 # Test execution
-TESTS = test_build test_build_properties
+TESTS = test_build test_build_properties test_iso_properties
 
 # QEMU testing (if available)
 if HAVE_QEMU

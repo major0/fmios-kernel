@@ -26,8 +26,8 @@ qemu-test: fmios.iso
 	@echo "Running QEMU test with Multiboot2 kernel via GRUB..."
 	@echo "Stage 1: Testing kernel boot and basic execution..."
 	@rm -f serial.log
-	@timeout 5s qemu-system-x86_64 -serial file:serial.log -display none -cdrom fmios.iso || true
-	@if test -f serial.log && grep -q "1ABCDEFGH.*6OPQRS" serial.log; then \
+	@timeout 5s qemu-system-x86_64 -machine pc -serial file:serial.log -display none -cdrom fmios.iso || true
+	@if test -f serial.log && grep -q "FMI/OS Stage 1 - Hello World Kernel" serial.log; then \
 		echo "QEMU test PASSED: Kernel successfully booted via GRUB and executed"; \
 		rm -f serial.log; \
 	else \

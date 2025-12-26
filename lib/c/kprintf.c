@@ -27,7 +27,7 @@
 static void serial_putchar(char c)
 {
 	/* COM1 port 0x3F8 - minimal implementation for Stage 1 */
-	__asm__ volatile("outb %0, $0x3F8" : : "a"(c));
+	__asm__ volatile("movw $0x3f8, %%dx; outb %0, %%dx" : : "a"(c) : "dx");
 }
 
 static void serial_puts(const char *str)
